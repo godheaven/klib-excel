@@ -16,9 +16,6 @@ import org.junit.jupiter.api.Test;
  */
 public class ExcelReaderTest {
 
-    public ExcelReaderTest() {
-    }
-
     @Test
     public void readExcel() throws Exception {
 
