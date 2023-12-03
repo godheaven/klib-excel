@@ -4,7 +4,8 @@ import cl.kanopus.common.util.Utils;
 
 public class LoadValidatorException extends Exception {
 
-    private final ErrorCode code;
+    private static final long serialVersionUID = 1L;
+	private final ErrorCode code;
     private final Object[] args;
 
     public LoadValidatorException(ErrorCode code) {

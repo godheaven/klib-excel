@@ -1,48 +1,62 @@
 package cl.kanopus.excel.writer;
 
+import cl.kanopus.excel.writer.streaming.KSheet;
+import cl.kanopus.excel.writer.streaming.KRow;
 import java.util.List;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 
-public class RecordsExcel extends AbstractExcel {
 
-    public static final String SHEET_REGISTROS = "REGISTROS";
+public class RecordsExcel extends KanopusExcel {
 
-    private final HSSFSheet sheet;
-    private int indexRow = 0;
+    public static final String SHEET_RECORDS = "RECORDS";
+
     private int columns = 0;
+    private int totalRecords = 0;
+    private boolean enableRecordStyle = false;
+    private KSheet sheet;
 
     public RecordsExcel() {
-        this.sheet = wb.createSheet(SHEET_REGISTROS);
+    }
+
+    public RecordsExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
+        super(rowAccessWindowSize, compressTmpFiles);
+        this.sheet = createSheet(SHEET_RECORDS);
     }
 
     public void createHeaders(List<String> titles) {
-        this.row = sheet.createRow(indexRow++);
-        this.columns = titles.size();
-        int c = 0;
+        KRow header = sheet.createRow();
         for (String title : titles) {
-            createCell(c++, title.toUpperCase(), Style.TABLE_TITLE_NORMAL);
+            header.createCell(title.toUpperCase(), Style.TABLE_TITLE_NORMAL);
         }
         sheet.createFreezePane(0, 1);
+        columns = titles.size();
     }
 
     public void createRecord(List<Object> values) {
-        this.row = sheet.createRow(indexRow++);
-        int c = 0;
+        KRow row = sheet.createRow();
         for (Object value : values) {
-            createCell(c++, value, Style.TABLE_VALUE_NORMAL);
+            row.createCell(value, enableRecordStyle ? Style.TABLE_VALUE_NORMAL : null);
         }
+        this.totalRecords++;
     }
 
-    public void autoSizeColumns() {
-        for (int i = 0; i < columns; i++) {
-            sheet.autoSizeColumn(i);
-        }
+    public void autoSize() {
+         sheet.autoFilter(columns);
     }
 
     public void autoFilter() {
-        if (indexRow > 0) {
-            sheet.setAutoFilter(new CellRangeAddress(0, indexRow - 1, 0, columns - 1));
-        }
+        sheet.autoSize(columns);
     }
+
+    public boolean isEnableRecordStyle() {
+        return enableRecordStyle;
+    }
+
+    public void setEnableRecordStyle(boolean enableRecordStyle) {
+        this.enableRecordStyle = enableRecordStyle;
+    }
+
+    public int getTotalRecords() {
+        return totalRecords;
+    }
+
 }

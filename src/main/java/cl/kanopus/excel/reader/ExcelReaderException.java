@@ -2,7 +2,8 @@ package cl.kanopus.excel.reader;
 
 public class ExcelReaderException extends RuntimeException {
 
-    private final int currentRow;
+	private static final long serialVersionUID = 1L;
+	private final int currentRow;
     private final String sheetName;
 
     public ExcelReaderException(Exception ex) {

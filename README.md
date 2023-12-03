@@ -52,104 +52,47 @@ public class ExcelReaderTest {
 
 2. Writing Excel
 ```java
-package cl.kanopus.excel.writer;
-
-public class ProductTO {
-
-    private final String code;
-    private final String name;
-    private final double price;
-
-    public ProductTO(String code, String name, double price) {
-        this.code = code;
-        this.name = name;
-        this.price = price;
-    }
-
-    //Getter
-
-}
-```
-
-```java
-package cl.kanopus.excel.writer;
-
-import java.util.Iterator;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-
-public class ProductsExcel extends AbstractExcel {
-
-    public static final String SHEET_PRODUCTS = "PRODUCTS";
-    
-    public enum Field {
-
-        CODE,
-        NAME,
-        PRICE;
-
-    }
-
-    public void createSheetProducts(Iterator<ProductTO> products) {
-
-        int indexRow = 0;
-        HSSFSheet sheet = wb.createSheet(SHEET_PRODUCTS);
-
-        this.row = sheet.createRow(indexRow++);
-        int column = 0;
-        createCell(column++, Field.CODE.name(), Style.TABLE_TITLE_REQUIRED, "This is the title of the CODE field");
-        createCell(column++, Field.NAME.name(), Style.TABLE_TITLE_REQUIRED, "This is the title of the NAME field");
-        createCell(column++, Field.PRICE.name(), Style.TABLE_TITLE_OPTIONAL, "This is the title of the PRICE field");
-
-        while (products.hasNext()) {
-            ProductTO p = products.next();
-            this.row = sheet.createRow(indexRow++);
-            column = 0;
-            createCell(column++, p.getCode(), Style.TABLE_VALUE_INSERT);
-            createCell(column++, p.getName(), Style.TABLE_VALUE_INSERT);
-            createCell(column++, p.getPrice(), Style.TABLE_VALUE_INSERT);
-        }
-
-        for (int i = 0; i < column; i++) {
-            sheet.autoSizeColumn(i);
-        }
-        sheet.createFreezePane(0, 1);
-
-    }
-
-}
-
-```
-
-```java
 package cl.kanopus.excel;
 
-import cl.kanopus.common.util.DesktopUtils;
-import cl.kanopus.common.util.FileUtils;
-import cl.kanopus.excel.writer.ProductTO;
-import cl.kanopus.excel.writer.ProductsExcel;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
+import cl.kanopus.common.util.DesktopUtils;
+import cl.kanopus.common.util.FileUtils;
+import cl.kanopus.excel.writer.KRow;
+import cl.kanopus.excel.writer.KSheet;
+import cl.kanopus.excel.writer.KanopusExcel;
 
 public class ExcelWriterTest {
 
     @Test
-    public void testGenerateExcel() throws Exception {
+    public void generateExcelOneMillionRecords() throws Exception {
+        // 1millon --> 47seconds --> 19.03 MB --> 10.000 in memory
 
-        ArrayList<ProductTO> products = new ArrayList<>();
-        products.add(new ProductTO("A123456789", "ASPIRINA", 1000));
-        products.add(new ProductTO("B123456789", "BETAMETASONA", 1000));
-        products.add(new ProductTO("C123456789", "CLORFENAMINA", 1000));
-        products.add(new ProductTO("D123456789", "DERMOCREAM", 1000));
-        products.add(new ProductTO("E123456789", "EUCALIPTUS", 1000));
-        
-        ProductsExcel excel = new ProductsExcel();
-        excel.createSheetProducts(products.iterator());
+        KanopusExcel excel = new KanopusExcel(10000, true);
+        KSheet sheet = excel.createSheet("RECORDS");
+
+        // HEADER
+        KRow header = sheet.createRow();
+        header.createCell("Code", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
+        header.createCell("Name", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
+        header.createCell("Price", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
+
+        // RECORDS
+        for (int i = 0; i < 1000000; i++) {
+            KRow row = sheet.createRow();
+            row.createCell("A123456789-" + i);
+            row.createCell("name" + i);
+            row.createCell(i);
+        }
+
+        sheet.createFreezePane(0, 1);
+        sheet.autoFilter(header.getColumns());
+        sheet.autoSize(header.getColumns());
 
         ByteArrayOutputStream baos = excel.generateOutput();
         File file = FileUtils.createFile(baos, "products.xlsx");
- 
+
         DesktopUtils.open(file);
 
     }
