@@ -48,15 +48,20 @@ public class KRow {
             cell.setCellValue((String) value);
         } else if (value instanceof Double) {
             cell.setCellValue((Double) value);
+        } else if (value instanceof Integer) {
+            cell.setCellValue((Integer) value);
         } else if (value instanceof Long) {
             cell.setCellValue((Long) value);
         } else if (value instanceof Calendar) {
             cell.setCellValue((Calendar) value);
         } else if (value instanceof Date) {
+            cell.getCellStyle().setDataFormat((short)15); //BuiltinFormats (d-mmm-yy)
             cell.setCellValue((Date) value);
         } else if (value instanceof LocalDate) {
-            cell.setCellValue((LocalDate) value);
+            cell.getCellStyle().setDataFormat((short)15); //BuiltinFormats (d-mmm-yy)
+            cell.setCellValue((LocalDate) value); 
         } else if (value instanceof LocalDateTime) {
+            cell.getCellStyle().setDataFormat((short)22); //BuiltinFormats (m/d/yy h:mm)
             cell.setCellValue((LocalDateTime) value);
         } else if (value instanceof Boolean) {
             cell.setCellValue((value == Boolean.TRUE) ? "YES" : "NO");

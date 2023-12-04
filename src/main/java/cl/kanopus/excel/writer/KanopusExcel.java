@@ -41,7 +41,6 @@ public class KanopusExcel {
         this.wb = new SXSSFWorkbook(new XSSFWorkbook(), 5000, true, true);
         this.factory = this.wb.getCreationHelper();
         createStyles(this.wb);
-
     }
 
     public KanopusExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
