@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cl.kanopus.util</groupId>
     <artifactId>klib-excel</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.5</version>
     <packaging>jar</packaging>
     <name>klib-excel</name>
 
@@ -27,12 +27,7 @@
             <artifactId>poi-ooxml</artifactId>
             <version>5.2.5</version>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.0</version>
-        </dependency>
-
+         
         <dependency>
             <groupId>cl.kanopus.util</groupId>
             <artifactId>klib-common</artifactId>

@@ -1,13 +1,18 @@
-package cl.kanopus.excel.writer;
+package cl.kanopus.excel.writer.iterator;
 
-import cl.kanopus.excel.writer.streaming.KSheet;
+import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
+import cl.kanopus.excel.writer.streaming.KSheet;
 import java.util.List;
 
+/**
+ *
+ * @author Pablo Diaz Saavedra
+ * @email pabloandres.diazsaavedra@gmail.com
+ */
+class RecordsExcel extends KanopusExcel {
 
-public class RecordsExcel extends KanopusExcel {
-
-    public static final String SHEET_RECORDS = "RECORDS";
+    private static final String SHEET_RECORDS = "RECORDS";
 
     private int columns = 0;
     private int totalRecords = 0;
@@ -19,7 +24,7 @@ public class RecordsExcel extends KanopusExcel {
 
     public RecordsExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
         super(rowAccessWindowSize, compressTmpFiles);
-        this.sheet = createSheet(SHEET_RECORDS);
+        this.sheet = super.createSheet(SHEET_RECORDS);
     }
 
     public void createHeaders(List<String> titles) {
@@ -40,7 +45,7 @@ public class RecordsExcel extends KanopusExcel {
     }
 
     public void autoSize() {
-         sheet.autoFilter(columns);
+        sheet.autoFilter(columns);
     }
 
     public void autoFilter() {

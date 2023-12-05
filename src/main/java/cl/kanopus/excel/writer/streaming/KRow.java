@@ -41,9 +41,22 @@ public class KRow {
 
         // 1. Create the date cell style
         if (style != null) {
-            cell.setCellStyle(KanopusExcel.styles.get(style.name()));
+            cell.setCellStyle(excel.styles.get(style.name()));
         }
 
+        setCellValue(cell, value);
+
+        if (!Utils.isNullOrEmpty(comment)) {
+            // Assign the comment to the cell
+            Comment cellcomment = cell.getSheet().createDrawingPatriarch().createCellComment(
+                    new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
+            RichTextString richText = excel.getFactory().createRichTextString(comment);
+            cellcomment.setString(richText);
+        }
+
+    }
+
+    protected void setCellValue(SXSSFCell cell, Object value) {
         if (value instanceof String) {
             cell.setCellValue((String) value);
         } else if (value instanceof Double) {
@@ -55,26 +68,31 @@ public class KRow {
         } else if (value instanceof Calendar) {
             cell.setCellValue((Calendar) value);
         } else if (value instanceof Date) {
-            cell.getCellStyle().setDataFormat((short)15); //BuiltinFormats (d-mmm-yy)
-            cell.setCellValue((Date) value);
+            if (excel.isAutoformat()) {
+                cell.setCellValue(excel.applyAutoFormatDate((Date) value));
+            } else {
+                cell.setCellValue((Date) value);
+            }
         } else if (value instanceof LocalDate) {
-            cell.getCellStyle().setDataFormat((short)15); //BuiltinFormats (d-mmm-yy)
-            cell.setCellValue((LocalDate) value); 
+            if (excel.isAutoformat()) {
+                cell.setCellValue(excel.applyAutoFormatDate((LocalDate) value));
+            } else {
+                cell.setCellValue((LocalDate) value);
+            }
         } else if (value instanceof LocalDateTime) {
-            cell.getCellStyle().setDataFormat((short)22); //BuiltinFormats (m/d/yy h:mm)
-            cell.setCellValue((LocalDateTime) value);
+            if (excel.isAutoformat()) {
+                cell.setCellValue(excel.applyAutoFormatDate((LocalDateTime) value));
+            } else {
+                cell.setCellValue((LocalDateTime) value);
+            }
         } else if (value instanceof Boolean) {
-            cell.setCellValue((value == Boolean.TRUE) ? "YES" : "NO");
+            if (excel.isAutoformat()) {
+                cell.setCellValue(excel.applyAutoFormatBoolean((Boolean) value));
+            } else {
+                cell.setCellValue((Boolean) value);
+            }
         } else {
             cell.setCellValue(value == null ? "" : String.valueOf(value));
-        }
-
-        if (!Utils.isNullOrEmpty(comment)) {
-            // Assign the comment to the cell
-            Comment cellcomment = cell.getSheet().createDrawingPatriarch().createCellComment(
-                    new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
-            RichTextString richText = excel.getFactory().createRichTextString(comment);
-            cellcomment.setString(richText);
         }
 
     }

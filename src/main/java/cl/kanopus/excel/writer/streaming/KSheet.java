@@ -1,10 +1,7 @@
 package cl.kanopus.excel.writer.streaming;
 
 import cl.kanopus.excel.writer.KanopusExcel;
-import java.io.IOException;
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 
 public class KSheet {
@@ -17,6 +14,7 @@ public class KSheet {
     public KSheet(KanopusExcel excel, SXSSFSheet sheet) {
         this.excel = excel;
         this.sheet = sheet;
+        this.sheet.setDefaultColumnWidth(15);
     }
 
     public KRow createRow() {
@@ -39,27 +37,14 @@ public class KSheet {
     }
 
     public void autoSize(int columns) {
-        if (columns > 0 && indexRow < AUTO_LIMIT && !sheet.areAllRowsFlushed()) {
+
+        if (columns > 0 && indexRow < AUTO_LIMIT) {
             for (int i = 0; i < columns; i++) {
                 sheet.trackAllColumnsForAutoSizing();
                 sheet.autoSizeColumn(i, false);
             }
         }
-    }
 
-    public void setMerge(int numRow, int untilRow, int numCol, int untilCol, boolean border) {
-        CellRangeAddress cellMerge = new CellRangeAddress(numRow, untilRow, numCol, untilCol);
-        sheet.addMergedRegion(cellMerge);
-        if (border) {
-            setBordersToMergedCells(sheet, cellMerge);
-        }
-    }
-
-    protected void setBordersToMergedCells(SXSSFSheet sheet, CellRangeAddress rangeAddress) {
-        RegionUtil.setBorderTop(BorderStyle.THIN, rangeAddress, sheet);
-        RegionUtil.setBorderLeft(BorderStyle.THIN, rangeAddress, sheet);
-        RegionUtil.setBorderRight(BorderStyle.THIN, rangeAddress, sheet);
-        RegionUtil.setBorderBottom(BorderStyle.THIN, rangeAddress, sheet);
     }
 
 }

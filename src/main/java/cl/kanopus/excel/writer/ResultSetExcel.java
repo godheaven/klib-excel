@@ -12,12 +12,27 @@ import java.util.Map;
  */
 public class ResultSetExcel extends KanopusExcel {
 
-    public static final String SHEET_RECORDS = "RECORDS";
+    private static final String SHEET_RECORDS = "RECORDS";
+    private boolean enableAutoFilter = true;
+    private boolean enableFreezePane = true;
 
-    public void createSheet(Iterator<Map<String, Object>> records) {
+    public ResultSetExcel() {
+    }
+
+    public ResultSetExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
+        super(rowAccessWindowSize, compressTmpFiles);
+    }
+
+    public int createSheet(Iterator<Map<String, Object>> records) {
+        return createSheet(SHEET_RECORDS, records);
+    }
+
+    public int createSheet(String sheetName, Iterator<Map<String, Object>> records) {
+        int rows = 0;
         KSheet sheet = createSheet(SHEET_RECORDS);
 
         boolean headerIncluded = false;
+
         int columns = 0;
         while (records.hasNext()) {
             Map<String, Object> p = records.next();
@@ -38,10 +53,22 @@ public class ResultSetExcel extends KanopusExcel {
 
         }
 
-        sheet.autoFilter(columns);
-        sheet.autoSize(columns);
-        sheet.createFreezePane(0, 1);
+        if (enableAutoFilter) {
+            sheet.autoFilter(columns);
+        }
 
+        if (enableFreezePane) {
+            sheet.createFreezePane(0, 1);
+        }
+        return rows;
+    }
+
+    public void setEnableAutoFilter(boolean enableAutoFilter) {
+        this.enableAutoFilter = enableAutoFilter;
+    }
+
+    public void setEnableFreezePane(boolean enableFreezePane) {
+        this.enableFreezePane = enableFreezePane;
     }
 
 }
