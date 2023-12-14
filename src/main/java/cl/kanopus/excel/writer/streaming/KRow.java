@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -28,7 +29,7 @@ public class KRow {
     }
 
     public void createCell(Object value) {
-        createCell(value, null, null);
+        createCell(value, (KanopusExcel.Style) null, null);
     }
 
     public void createCell(Object value, KanopusExcel.Style style) {
@@ -36,27 +37,23 @@ public class KRow {
     }
 
     public void createCell(Object value, KanopusExcel.Style style, String comment) {
+        CellStyle cellStyle = calculateStyle(value, style);
+        createCell(value, cellStyle, comment);
+    }
 
+    public void createCell(Object value, CellStyle style, String comment) {
         SXSSFCell cell = row.createCell(this.columns++);
-
-        // 1. Create the date cell style
         if (style != null) {
-            cell.setCellStyle(excel.styles.get(style.name()));
+            cell.setCellStyle(style);
         }
-
         setCellValue(cell, value);
 
         if (!Utils.isNullOrEmpty(comment)) {
-            // Assign the comment to the cell
-            Comment cellcomment = cell.getSheet().createDrawingPatriarch().createCellComment(
-                    new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
-            RichTextString richText = excel.getFactory().createRichTextString(comment);
-            cellcomment.setString(richText);
+            setComment(cell, comment);
         }
-
     }
 
-    protected void setCellValue(SXSSFCell cell, Object value) {
+    private void setCellValue(SXSSFCell cell, Object value) {
         if (value instanceof String) {
             cell.setCellValue((String) value);
         } else if (value instanceof Double) {
@@ -68,33 +65,48 @@ public class KRow {
         } else if (value instanceof Calendar) {
             cell.setCellValue((Calendar) value);
         } else if (value instanceof Date) {
-            if (excel.isAutoformat()) {
-                cell.setCellValue(excel.applyAutoFormatDate((Date) value));
-            } else {
-                cell.setCellValue((Date) value);
-            }
+            cell.setCellValue((Date) value);
         } else if (value instanceof LocalDate) {
-            if (excel.isAutoformat()) {
-                cell.setCellValue(excel.applyAutoFormatDate((LocalDate) value));
-            } else {
-                cell.setCellValue((LocalDate) value);
-            }
+            cell.setCellValue((LocalDate) value);
         } else if (value instanceof LocalDateTime) {
-            if (excel.isAutoformat()) {
-                cell.setCellValue(excel.applyAutoFormatDate((LocalDateTime) value));
-            } else {
-                cell.setCellValue((LocalDateTime) value);
-            }
+            cell.setCellValue((LocalDateTime) value);
         } else if (value instanceof Boolean) {
-            if (excel.isAutoformat()) {
-                cell.setCellValue(excel.applyAutoFormatBoolean((Boolean) value));
-            } else {
-                cell.setCellValue((Boolean) value);
-            }
+            cell.setCellValue((Boolean) value);
         } else {
             cell.setCellValue(value == null ? "" : String.valueOf(value));
         }
 
+    }
+
+    private void setComment(SXSSFCell cell, String comment) {
+        // Assign the comment to the cell
+        Comment cellcomment = cell.getSheet().createDrawingPatriarch().createCellComment(
+                new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
+        RichTextString richText = excel.getFactory().createRichTextString(comment);
+        cellcomment.setString(richText);
+    }
+
+    private CellStyle calculateStyle(Object value, KanopusExcel.Style style) {
+        CellStyle cellStyle = null;
+        if (style != null) {
+            cellStyle = excel.styles.get(style.name());
+        }
+
+        if (value instanceof Date || value instanceof LocalDate) {
+            if (style == null) {
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATE.name());
+            } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
+            }
+        } else if (value instanceof LocalDateTime) {
+            if (style == null) {
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATETIME.name());
+            } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
+            }
+        }
+
+        return cellStyle;
     }
 
 }

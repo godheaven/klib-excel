@@ -31,8 +31,12 @@ public class KSheet {
     }
 
     public void autoFilter(int columns) {
+        autoFilter(0, columns);
+    }
+    
+    public void autoFilter(int firstRow, int columns) {
         if (columns > 0 && indexRow > 0 && indexRow < AUTO_LIMIT) {
-            sheet.setAutoFilter(new CellRangeAddress(0, indexRow - 1, 0, columns - 1));
+            sheet.setAutoFilter(new CellRangeAddress(firstRow, indexRow - 1, 0, columns - 1));
         }
     }
 

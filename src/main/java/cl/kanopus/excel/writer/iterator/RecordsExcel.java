@@ -17,9 +17,11 @@ class RecordsExcel extends KanopusExcel {
     private int columns = 0;
     private int totalRecords = 0;
     private boolean enableRecordStyle = false;
-    private KSheet sheet;
+    private final KSheet sheet;
 
     public RecordsExcel() {
+        super();
+        this.sheet = super.createSheet(SHEET_RECORDS);
     }
 
     public RecordsExcel(int rowAccessWindowSize, boolean compressTmpFiles) {

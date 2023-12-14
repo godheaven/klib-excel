@@ -5,7 +5,6 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import cl.kanopus.common.util.DesktopUtils;
 import cl.kanopus.common.util.FileUtils;
-import cl.kanopus.common.util.Utils;
 import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.ResultSetExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
@@ -39,11 +38,11 @@ public class ExcelWriterTest {
             @Override
             public Map<String, Object> next() {
                 Map<String, Object> rs = new LinkedHashMap<>();
-                rs.put("Title1", "A123456789-" + index);
-                rs.put("Title2", index);
-                rs.put("Title3", new Date());
-                rs.put("Title4", LocalDate.now());
-                rs.put("Title5", LocalDateTime.now());
+                rs.put("Title1 String", "A123456789-" + index);
+                rs.put("Title2 int", index);
+                rs.put("Title3 Date", new Date());
+                rs.put("Title4 LocalDate", LocalDate.now());
+                rs.put("Title5 LocalDateTime", LocalDateTime.now());
                 index++;
 
                 return rs;
@@ -61,11 +60,9 @@ public class ExcelWriterTest {
     
     @Test
     public void generateExcelOneMillionRecords() throws Exception {
-        //1millon --> 11seconds --> 25 MB --> 10.000 in memory
+        //1millon --> 11seconds --> 25 MB --> 5.000 in memory (default contructor)
 
-        KanopusExcel excel = new KanopusExcel(1000, true);
-        excel.setAutoformat(true);
-        
+        KanopusExcel excel = new KanopusExcel();
         KSheet sheet = excel.createSheet("RECORDS");
 
         // HEADER
@@ -75,15 +72,17 @@ public class ExcelWriterTest {
         header.createCell("Date", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
         header.createCell("LocalDate", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
         header.createCell("LocalDatetime", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
+        header.createCell("Boolean", KanopusExcel.Style.TABLE_TITLE_INFO, "This is the title of the CODE field");
 
         // RECORDS
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             KRow row = sheet.createRow();
             row.createCell("A123456789-" + i);
             row.createCell(i);
             row.createCell(new Date());
             row.createCell(LocalDate.now());
             row.createCell(LocalDateTime.now());
+            row.createCell(i%2==0);
         }
 
         sheet.createFreezePane(0, 1);
