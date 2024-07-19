@@ -93,7 +93,7 @@ public class LoadValidator {
         if (regex != null) {
             validaRegex(data, regex, key);
         }
-        return data;
+        return (data == null) ? "" : data.trim();
     }
 
     public boolean parseBoolean(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {

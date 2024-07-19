@@ -12,6 +12,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * File for HSSF testing/examples
@@ -48,8 +52,9 @@ public final class ExcelReader {
     public void processAllSheets(File file) throws ExcelReaderException {
         try {
             try (FileInputStream fis = new FileInputStream(file);) {
-                processAllSheets(fis);
+                processAllSheets(fis, file.getName().toLowerCase().endsWith("xlsx"));
             }
+
         } catch (ExcelReaderException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -57,24 +62,29 @@ public final class ExcelReader {
         }
     }
 
-    public void processAllSheets(InputStream is) throws ExcelReaderException {
+    public void processAllSheets(InputStream is, boolean xlsx) throws ExcelReaderException {
+        if (xlsx) {
+            processAllSheetsXlsx(is);
+        } else {
+            processAllSheetsXls(is);
+        }
+    }
 
+    private void processAllSheetsXlsx(InputStream is) throws ExcelReaderException {
         try {
 
-            HSSFWorkbook wb = null;
-            try {
-                wb = new HSSFWorkbook(is);
-
+            try (XSSFWorkbook wb = new XSSFWorkbook(is)) {
+                FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
                 for (int k = 0; k < wb.getNumberOfSheets(); k++) {
 
                     SheetEventListener listener = findListener(wb.getSheetName(k));
                     if (listener != null) {
                         totalProcessedSheets++;
-                        HSSFSheet sheet = wb.getSheetAt(k);
+                        XSSFSheet sheet = wb.getSheetAt(k);
                         int rows = sheet.getPhysicalNumberOfRows();
 
                         for (int r = 0; r < rows; r++) {
-                            HSSFRow row = sheet.getRow(r);
+                            XSSFRow row = sheet.getRow(r);
                             if (row == null || r < listener.getStartProcess()) {
                                 continue;
                             }
@@ -86,7 +96,7 @@ public final class ExcelReader {
                                     Cell cell = cells.next();
 
                                     String key = "col" + cell.getColumnIndex();
-                                    String value = formatter.formatCellValue(cell);
+                                    String value = formatter.formatCellValue(cell, evaluator);
 
                                     if (r == listener.getStartProcess()) {
                                         if (value != null) {
@@ -117,10 +127,70 @@ public final class ExcelReader {
 
                 }
 
-            } finally {
-                if (wb != null) {
-                    wb.close();
+            }
+        } catch (ExcelReaderException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ExcelReaderException(ex);
+        }
+    }
+
+    private void processAllSheetsXls(InputStream is) throws ExcelReaderException {
+        try {
+
+            try (HSSFWorkbook wb = new HSSFWorkbook(is)) {
+                FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
+                for (int k = 0; k < wb.getNumberOfSheets(); k++) {
+                    SheetEventListener listener = findListener(wb.getSheetName(k));
+                    if (listener != null) {
+                        totalProcessedSheets++;
+                        HSSFSheet sheet = wb.getSheetAt(k);
+                        int rows = sheet.getPhysicalNumberOfRows();
+
+                        for (int r = 0; r < rows; r++) {
+                            HSSFRow row = sheet.getRow(r);
+                            if (row == null || r < listener.getStartProcess()) {
+                                continue;
+                            }
+
+                            int countContent = 0;
+                            DataFormatter formatter = new DataFormatter();
+                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
+                                try {
+                                    Cell cell = cells.next();
+
+                                    String key = "col" + cell.getColumnIndex();
+                                    String value = formatter.formatCellValue(cell, evaluator);
+
+                                    if (r == listener.getStartProcess()) {
+                                        if (value != null) {
+                                            hashTitles.put(key, titlesToUpperCase ? value.toUpperCase().trim() : value.trim());
+                                        }
+                                    } else {
+                                        countContent += (value != null && !value.trim().isEmpty()) ? 1 : 0;
+                                        hashRow.put(hashTitles.get(key), value != null ? value.trim() : null);
+                                    }
+                                } catch (Exception ex) {
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                }
+                            }
+
+                            if (!hashRow.isEmpty() && countContent > 0) {
+                                totalProcessedRecords++;
+                                try {
+                                    listener.getRowProcess().process(hashRow);
+                                } catch (LoadValidatorException lve) {
+                                    throw new ExcelReaderException(lve, lve.getCode().getMessage(lve.getArgs()), row.getRowNum(), listener.getSheetName());
+                                } catch (Exception ex) {
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                }
+                                hashRow.clear();
+                            }
+                        }
+                    }
+
                 }
+
             }
         } catch (ExcelReaderException ex) {
             throw ex;

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cl.kanopus.util</groupId>
     <artifactId>klib-excel</artifactId>
-    <version>2.0.6</version>
+    <version>2.0.8</version>
     <packaging>jar</packaging>
     <name>klib-excel</name>
 
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>cl.kanopus.util</groupId>
             <artifactId>klib-common</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.3</version>
         </dependency>
 
         <dependency>

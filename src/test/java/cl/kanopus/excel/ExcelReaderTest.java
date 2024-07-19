@@ -34,4 +34,21 @@ public class ExcelReaderTest {
         Assertions.assertEquals(9, reader.getTotalProcessedRecords());
     }
 
+    @Test
+    public void readExcelXlsx() throws Exception {
+
+        ExcelReader reader = new ExcelReader();
+        reader.addListener(new SheetEventListener("RECORDS", new RowProcess() {
+            @Override
+            public void process(HashMap<String, String> row) throws Exception {
+                System.out.println("row-->" + row);
+            }
+        }));
+
+        URL resource = ExcelReaderTest.class.getClassLoader().getResource("test_reader.xlsx");
+        reader.processAllSheets(new File(resource.getFile()));
+
+        Assertions.assertEquals(1, reader.getTotalProcessedSheets());
+        Assertions.assertEquals(9, reader.getTotalProcessedRecords());
+    }
 }
