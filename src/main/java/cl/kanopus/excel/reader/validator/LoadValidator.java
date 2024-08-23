@@ -3,7 +3,7 @@ package cl.kanopus.excel.reader.validator;
 import cl.kanopus.common.util.Utils;
 import cl.kanopus.excel.reader.validator.LoadValidatorException.ErrorCode;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class LoadValidator {
@@ -13,7 +13,8 @@ public class LoadValidator {
     public enum REGEX {
 
         STANDARD_NAME("^([a-zA-Z0-9_ -]+)$"),
-        RUT("^([0-9]+-[0-9Kk])$");
+        RUT("^([0-9]+-[0-9Kk])$"),
+        NUMBER("^([0-9]+)$");
 
         private final String expression;
 
@@ -35,7 +36,7 @@ public class LoadValidator {
         this.titlesToUpperCase = titlesToUpperCase;
     }
 
-    public Date parseDate(HashMap<String, String> hash, String key, boolean required, String pattern, int maxlength) throws LoadValidatorException {
+    public Date parseDate(Map<String, String> hash, String key, boolean required, String pattern, int maxlength) throws LoadValidatorException {
         String dateString = parseString(hash, key, required, maxlength);
 
         Date date = null;
@@ -48,7 +49,7 @@ public class LoadValidator {
         return date;
     }
 
-    public Long parseMoneyToLong(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {
+    public Long parseMoneyToLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -60,7 +61,7 @@ public class LoadValidator {
         }
     }
 
-    public Long parseLong(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {
+    public Long parseLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -72,7 +73,7 @@ public class LoadValidator {
         }
     }
 
-    public Integer parseInteger(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {
+    public Integer parseInteger(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -84,7 +85,7 @@ public class LoadValidator {
         }
     }
 
-    public String parseString(HashMap<String, String> hash, String key, boolean required, int maxLength, REGEX regex) throws LoadValidatorException {
+    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -96,25 +97,33 @@ public class LoadValidator {
         return (data == null) ? "" : data.trim();
     }
 
-    public boolean parseBoolean(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {
+    public Boolean parseBoolean(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
         }
 
-        return (data != null && ("true".equals(data.toLowerCase()) || "si".equals(data.toLowerCase())));
+        return data == null ? null : ("true".equals(data.toLowerCase()) || "si".equals(data.toLowerCase()));
     }
 
-    public String parseString(HashMap<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
+    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
         return parseString(hash, key, required, maxLength, null);
     }
 
-    public String parseRut(HashMap<String, String> hash, String key, boolean required) throws LoadValidatorException {
+    public String parseRut(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = parseString(hash, key, required, 10, REGEX.RUT);
-        if (data != null && !Utils.isRut(data)) {
+        if (!Utils.isNullOrEmpty(data) && !Utils.isRut(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_RUT_FORMAT_EXCEPTION, key);
         }
-        return data != null ? data.toUpperCase() : null;
+        return !Utils.isNullOrEmpty(data) ? data.toUpperCase() : null;
+    }
+
+    public String parseGTIN(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
+        String data = parseString(hash, key, required, 14, REGEX.NUMBER);
+        if (!Utils.isNullOrEmpty(data) && !Utils.isGTIN(data)) {
+            throw new LoadValidatorException(ErrorCode.VALUE_GTIN_FORMAT_EXCEPTION, key);
+        }
+        return !Utils.isNullOrEmpty(data) ? data.toUpperCase() : null;
     }
 
     public void validateRequired(String data, String label) throws LoadValidatorException {

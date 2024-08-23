@@ -5,7 +5,7 @@ import cl.kanopus.common.util.Utils;
 public class LoadValidatorException extends Exception {
 
     private static final long serialVersionUID = 1L;
-	private final ErrorCode code;
+    private final ErrorCode code;
     private final Object[] args;
 
     public LoadValidatorException(ErrorCode code) {
@@ -32,6 +32,7 @@ public class LoadValidatorException extends Exception {
 
         VALUE_NUMBER_FORMAT_EXCEPTION("El valor del campo [{0}] debe ser numerico."),
         VALUE_RUT_FORMAT_EXCEPTION("El valor del campo [{0}] no tiene un rut válido.\nEjemplo: 99999999-9"),
+        VALUE_GTIN_FORMAT_EXCEPTION("El valor del campo [{0}] no tiene un formato GTIN válido.\nGlobal Trade Item Number"),
         VALUE_REQUIRED("El valor del campo [{0}] es requerido"),
         VALUE_VIOLATES_REGEX("El valor del campo [{0}] no cumple con los valores permitidos."),
         VALUE_VIOLATES_MAXLENGTH("El valor del campo [{0}] excede el máximo permitido de {1} caracteres."),
