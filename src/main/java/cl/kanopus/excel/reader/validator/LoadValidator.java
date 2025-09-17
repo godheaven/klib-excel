@@ -1,3 +1,26 @@
+/*-
+ * !--
+ * For support and inquiries regarding this library, please contact:
+ *   soporte@kanopus.cl
+ * 
+ * Project website:
+ *   https://www.kanopus.cl
+ * %%
+ * Copyright (C) 2025 Pablo Díaz Saavedra
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * --!
+ */
 package cl.kanopus.excel.reader.validator;
 
 import cl.kanopus.common.util.Utils;
@@ -55,7 +78,16 @@ public class LoadValidator {
             validateRequired(data, key);
         }
         try {
-            return (data == null || "".equals(data)) ? null : Long.valueOf(data.replaceAll("\\$", "").replaceAll("\\.", "").replaceAll(",", "").trim());
+            Long value = null;
+            if (!Utils.isNullOrEmpty(data)) {
+                value = Long.valueOf(data.replaceAll("\\$", "").replaceAll("\\.", "").replaceAll(",", "").trim());
+                if (value < 0) {
+                    throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_NEGATIVE_EXCEPTION, key);
+                }
+            }
+            return value;
+        } catch (LoadValidatorException le) {
+            throw le;
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
@@ -85,12 +117,32 @@ public class LoadValidator {
         }
     }
 
+    public String parseStringCutoff(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
+        return parseString(hash, key, required, maxLength, null, true);
+    }
+
+    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
+        return parseString(hash, key, required, maxLength, null, false);
+    }
+
     public String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex) throws LoadValidatorException {
+        return parseString(hash, key, required, maxLength, regex, false);
+    }
+
+    private String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex, boolean cutoff) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
         }
-        validateMaxlength(data, maxLength, key);
+
+        if (cutoff) {
+            if (data != null && data.length() > maxLength) {
+                data = data.substring(0, maxLength);
+            }
+        } else {
+            validateMaxlength(data, maxLength, key);
+        }
+
         if (regex != null) {
             validaRegex(data, regex, key);
         }
@@ -104,10 +156,6 @@ public class LoadValidator {
         }
 
         return data == null ? null : ("true".equals(data.toLowerCase()) || "si".equals(data.toLowerCase()));
-    }
-
-    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
-        return parseString(hash, key, required, maxLength, null);
     }
 
     public String parseRut(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {

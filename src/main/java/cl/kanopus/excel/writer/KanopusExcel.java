@@ -1,30 +1,43 @@
+/*-
+ * !--
+ * For support and inquiries regarding this library, please contact:
+ *   soporte@kanopus.cl
+ *
+ * Project website:
+ *   https://www.kanopus.cl
+ * %%
+ * Copyright (C) 2025 Pablo Díaz Saavedra
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * --!
+ */
 package cl.kanopus.excel.writer;
 
 import cl.kanopus.excel.writer.streaming.KSheet;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-/**
- *
- * @author Pablo Diaz Saavedra
- * @email pabloandres.diazsaavedra@gmail.com
- */
 public class KanopusExcel {
-    
+
     public enum Style {
-        
+
         FONT_BLACK_BOLD,
         FONT_BLACK_NORMAL,
         FONT_RED_BOLD,
@@ -35,37 +48,38 @@ public class KanopusExcel {
         TABLE_VALUE_NORMAL,
         TABLE_VALUE_INSERT
     }
-    
+
     public enum DefaultStyle {
         DEFAULT_DATE,
         DEFAULT_DATETIME,
         DEFAULT_VALUE_NORMAL,
         DEFAULT_VALUE_NORMAL_DATE,
         DEFAULT_VALUE_NORMAL_DATETIME,
-        
+
     }
+
     public final Map<String, CellStyle> styles = new HashMap<>();
-    
+
     private final SXSSFWorkbook wb;
-    
+
     private final CreationHelper factory;
-    
+
     public KanopusExcel() {
         this.wb = new SXSSFWorkbook(new XSSFWorkbook(), 5000, true, false);
         this.factory = this.wb.getCreationHelper();
         createStyles(this.wb);
     }
-    
+
     public KanopusExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
         this.wb = new SXSSFWorkbook(new XSSFWorkbook(), rowAccessWindowSize, compressTmpFiles, false);
         this.factory = this.wb.getCreationHelper();
         createStyles(this.wb);
     }
-    
+
     public KSheet createSheet(String sheetname) {
         return new KSheet(this, wb.createSheet(sheetname));
     }
-    
+
     public final ByteArrayOutputStream generateOutput() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (wb) {
@@ -74,7 +88,7 @@ public class KanopusExcel {
         }
         return out;
     }
-    
+
     public CreationHelper getFactory() {
         return factory;
     }
@@ -85,7 +99,7 @@ public class KanopusExcel {
      */
     private void createStyles(SXSSFWorkbook workbook) {
         if (styles.isEmpty()) {
-            
+
             short dateFormat = workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy");
             short dateTimeFormat = workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy HH:mm");
 
@@ -110,7 +124,7 @@ public class KanopusExcel {
             /* Style FONT_BLACK_BOLD */
             CellStyle style;
             Font font;
-            
+
             font = workbook.createFont();
             font.setBold(true);
             style = workbook.createCellStyle();
@@ -132,13 +146,13 @@ public class KanopusExcel {
             style.setFont(font);
             styles.put(Style.FONT_RED_BOLD.name(), style);
         }
-        
+
     }
-    
+
     private CellStyle createStyle(SXSSFWorkbook workbook, boolean bold, short fontColor, short backgroundColor) {
         return createStyle(workbook, bold, fontColor, backgroundColor, null);
     }
-    
+
     private CellStyle createStyle(SXSSFWorkbook workbook, boolean bold, short fontColor, short backgroundColor, Short format) {
         Font font = workbook.createFont();
         font.setBold(bold);
@@ -156,7 +170,7 @@ public class KanopusExcel {
         }
         return style;
     }
-    
+
     private CellStyle createStyle(SXSSFWorkbook workbook, short format) {
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat(format);

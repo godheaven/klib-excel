@@ -1,14 +1,38 @@
+/*-
+ * !--
+ * For support and inquiries regarding this library, please contact:
+ *   soporte@kanopus.cl
+ *
+ * Project website:
+ *   https://www.kanopus.cl
+ * %%
+ * Copyright (C) 2025 Pablo Díaz Saavedra
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * --!
+ */
 package cl.kanopus.excel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import org.junit.jupiter.api.Test;
 import cl.kanopus.common.util.DesktopUtils;
 import cl.kanopus.common.util.FileUtils;
 import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.ResultSetExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -16,15 +40,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- *
- * @author Pablo Diaz Saavedra
- * @email pabloandres.diazsaavedra@gmail.com
- */
-public class ExcelWriterTest {
-  
+class ExcelWriterTest {
+
     @Test
-    public void generateResultSetExcelOneMillion() throws Exception {
+    void generateResultSetExcelOneMillion() throws Exception {
         // 1millon --> 11seconds --> 23 MB --> 1000 in memory
 
         Iterator records = new Iterator<Map<String, Object>>() {
@@ -56,10 +75,10 @@ public class ExcelWriterTest {
         File file = FileUtils.createFile(baos, "products_rs_test.xlsx");
         DesktopUtils.open(file);
     }
-    
-    
+
+
     @Test
-    public void generateExcelOneMillionRecords() throws Exception {
+    void generateExcelOneMillionRecords() throws Exception {
         //1millon --> 11seconds --> 25 MB --> 5.000 in memory (default contructor)
 
         KanopusExcel excel = new KanopusExcel();
@@ -82,7 +101,7 @@ public class ExcelWriterTest {
             row.createCell(new Date());
             row.createCell(LocalDate.now());
             row.createCell(LocalDateTime.now());
-            row.createCell(i%2==0);
+            row.createCell(i % 2 == 0);
         }
 
         sheet.createFreezePane(0, 1);
