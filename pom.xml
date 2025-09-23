@@ -3,19 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+	<parent>
+		<groupId>cl.kanopus</groupId>
+		<artifactId>kanopus-core-parent</artifactId>
+		<version>3.5.6</version>
+	</parent>
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus.util</groupId>
 	<artifactId>klib-excel</artifactId>
 	<version>3.0.0</version>
 	<packaging>jar</packaging>
 	<name>klib-excel</name>
-
-	<parent>
-		<groupId>cl.kanopus</groupId>
-		<artifactId>kanopus-core-parent</artifactId>
-		<version>1.0.0</version>
-		<relativePath>../../kanopus-core-parent</relativePath>
-	</parent>
 
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
@@ -39,13 +38,7 @@
 			<artifactId>klib-common</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>6.2.10</version>
-			<scope>test</scope>
-		</dependency>
+		
 	</dependencies>
 
 </project>
