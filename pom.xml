@@ -6,18 +6,18 @@
 	<parent>
 		<groupId>cl.kanopus</groupId>
 		<artifactId>kanopus-core-parent</artifactId>
-		<version>3.5.6</version>
+		<version>3.5.7</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus.util</groupId>
 	<artifactId>klib-excel</artifactId>
-	<version>3.0.0</version>
+	<version>3.57.0</version>
 	<packaging>jar</packaging>
 	<name>klib-excel</name>
 
 	<properties>
-		<maven.test.skip>true</maven.test.skip>
+		<maven.test.skip>false</maven.test.skip>
 		<license.skip>false</license.skip>
 	</properties>
 
@@ -36,7 +36,6 @@
 		<dependency>
 			<groupId>cl.kanopus.util</groupId>
 			<artifactId>klib-common</artifactId>
-			<version>3.0.0</version>
 		</dependency>
 		
 	</dependencies>

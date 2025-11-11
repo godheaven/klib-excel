@@ -2,7 +2,7 @@
  * !--
  * For support and inquiries regarding this library, please contact:
  *   soporte@kanopus.cl
- * 
+ *
  * Project website:
  *   https://www.kanopus.cl
  * %%
@@ -11,9 +11,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,14 +25,20 @@ package cl.kanopus.excel.reader.validator;
 
 import cl.kanopus.common.util.Utils;
 import cl.kanopus.excel.reader.validator.LoadValidatorException.ErrorCode;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+@Setter
+@Getter
 public class LoadValidator {
-
+    
     private boolean titlesToUpperCase = true;
 
+    @Getter
     public enum REGEX {
 
         STANDARD_NAME("^([a-zA-Z0-9_ -]+)$"),
@@ -45,22 +51,10 @@ public class LoadValidator {
             this.expression = expression;
         }
 
-        public String getExpression() {
-            return expression;
-        }
-
     }
 
-    public boolean isTitlesToUpperCase() {
-        return titlesToUpperCase;
-    }
-
-    public void setTitlesToUpperCase(boolean titlesToUpperCase) {
-        this.titlesToUpperCase = titlesToUpperCase;
-    }
-
-    public Date parseDate(Map<String, String> hash, String key, boolean required, String pattern, int maxlength) throws LoadValidatorException {
-        String dateString = parseString(hash, key, required, maxlength);
+    public Date parseDate(Map<String, String> hash, String key, boolean required, String pattern, int maxLength) throws LoadValidatorException {
+        String dateString = parseString(hash, key, required, maxLength);
 
         Date date = null;
         if (dateString != null) {
@@ -86,8 +80,6 @@ public class LoadValidator {
                 }
             }
             return value;
-        } catch (LoadValidatorException le) {
-            throw le;
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
@@ -99,7 +91,7 @@ public class LoadValidator {
             validateRequired(data, key);
         }
         try {
-            return (data == null || "".equals(data)) ? null : Long.valueOf(data);
+            return (data == null || data.isEmpty()) ? null : Long.valueOf(data);
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
@@ -111,7 +103,7 @@ public class LoadValidator {
             validateRequired(data, key);
         }
         try {
-            return (data == null || "".equals(data)) ? null : Integer.valueOf(data);
+            return (data == null || data.isEmpty()) ? null : Integer.valueOf(data);
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
@@ -155,11 +147,11 @@ public class LoadValidator {
             validateRequired(data, key);
         }
 
-        return data == null ? null : ("true".equals(data.toLowerCase()) || "si".equals(data.toLowerCase()));
+        return data == null ? null : ("true".equalsIgnoreCase(data) || "si".equalsIgnoreCase(data));
     }
 
     public String parseRut(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = parseString(hash, key, required, 10, REGEX.RUT);
+        String data = parseString(hash, key, required, 100);
         if (!Utils.isNullOrEmpty(data) && !Utils.isRut(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_RUT_FORMAT_EXCEPTION, key);
         }
@@ -167,7 +159,7 @@ public class LoadValidator {
     }
 
     public String parseGTIN(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = parseString(hash, key, required, 14, REGEX.NUMBER);
+        String data = parseString(hash, key, required, 14);
         if (!Utils.isNullOrEmpty(data) && !Utils.isGTIN(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_GTIN_FORMAT_EXCEPTION, key);
         }
@@ -175,13 +167,13 @@ public class LoadValidator {
     }
 
     public void validateRequired(String data, String label) throws LoadValidatorException {
-        if (data == null || "".equals(data) || "0".equals(data)) {
+        if (data == null || data.isEmpty() || "0".equals(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_REQUIRED, label);
         }
     }
 
     public void validaRegex(String data, REGEX regex, String label) throws LoadValidatorException {
-        if (data != null && !"".equals(data) && !Pattern.matches(regex.getExpression(), data)) {
+        if (data != null && !data.isEmpty() && !Pattern.matches(regex.getExpression(), data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_VIOLATES_REGEX, label, regex.getExpression());
         }
     }

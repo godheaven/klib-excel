@@ -29,6 +29,7 @@ import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.ResultSetExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -44,9 +45,9 @@ class ExcelWriterTest {
 
     @Test
     void generateResultSetExcelOneMillion() throws Exception {
-        // 1millon --> 11seconds --> 23 MB --> 1000 in memory
+        // 1million --> 11seconds --> 23 MB --> 1000 in memory
 
-        Iterator records = new Iterator<Map<String, Object>>() {
+        Iterator<Map<String, Object>> records = new Iterator<>() {
             private int index = 0;
 
             @Override
@@ -71,15 +72,17 @@ class ExcelWriterTest {
         ResultSetExcel excel = new ResultSetExcel(1000, true);
         excel.createSheet(records);
 
-        ByteArrayOutputStream baos = excel.generateOutput();
-        File file = FileUtils.createFile(baos, "products_rs_test.xlsx");
+        ByteArrayOutputStream output = excel.generateOutput();
+        File file = FileUtils.createFile(output, "products_rs_test.xlsx");
+        Assertions.assertNotNull(file);
+        
         DesktopUtils.open(file);
     }
 
 
     @Test
     void generateExcelOneMillionRecords() throws Exception {
-        //1millon --> 11seconds --> 25 MB --> 5.000 in memory (default contructor)
+        //1million --> 11seconds --> 25 MB --> 5.000 in memory (default contractor)
 
         KanopusExcel excel = new KanopusExcel();
         KSheet sheet = excel.createSheet("RECORDS");
@@ -108,8 +111,9 @@ class ExcelWriterTest {
         sheet.autoFilter(header.getColumns());
         sheet.autoSize(header.getColumns());
 
-        ByteArrayOutputStream baos = excel.generateOutput();
-        File file = FileUtils.createFile(baos, "products.xlsx");
+        ByteArrayOutputStream output = excel.generateOutput();
+        File file = FileUtils.createFile(output, "products.xlsx");
+        Assertions.assertNotNull(file);
 
         DesktopUtils.open(file);
 
