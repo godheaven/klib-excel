@@ -34,7 +34,7 @@ import java.util.List;
 
 public abstract class ExcelReaderIterator<T> {
 
-    public InputStream read(Searcher searcher) throws IOException {
+    public <I extends Searcher<?>> InputStream read(I searcher) throws IOException {
         RecordsExcel excel = new RecordsExcel();
         excel.createHeaders(header());
 
@@ -61,7 +61,7 @@ public abstract class ExcelReaderIterator<T> {
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
-    protected abstract Paginator<T> findRecords(Searcher searcher);
+    protected abstract <I extends Searcher<?>> Paginator<T> findRecords(I searcher);
 
     protected abstract List<String> header();
 
