@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>cl.kanopus</groupId>
 		<artifactId>kanopus-core-parent</artifactId>
-		<version>3.5.7</version>
+		<version>3.58.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus.util</groupId>
 	<artifactId>klib-excel</artifactId>
-	<version>3.57.0</version>
+	<version>3.58.0</version>
 	<packaging>jar</packaging>
 	<name>klib-excel</name>
 
@@ -25,19 +25,19 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>5.4.1</version>
+			<version>5.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.4.1</version>
+			<version>5.5.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>cl.kanopus.util</groupId>
 			<artifactId>klib-common</artifactId>
 		</dependency>
-		
+
 	</dependencies>
 
 </project>
