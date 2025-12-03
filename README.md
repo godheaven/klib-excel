@@ -1,6 +1,4 @@
-
 ![Logo](https://www.kanopus.cl/admin/javax.faces.resource/images/logo-gray.png.xhtml?ln=paradise-layout)
-
 
 # klib-excel
 
@@ -8,21 +6,40 @@ This project is designed as a utility that allows you to generate Excel files in
 This simplifies the way you interact with the POI library and reduces the amount of complex code for Excel generation.
 
 ## Features
+
 - Allows you to read excel files in a simplified way
-- Allows you to write excel files in a simplified way 
+- Allows you to write excel files in a simplified way
+
+## 🚀 Installation
+
+Add the dependency to your `pom.xml`:
+
+```xml
+
+<dependency>
+	<groupId>cl.kanopus.util</groupId>
+	<artifactId>klib-excel</artifactId>
+	<version>3.58.0</version>
+</dependency>
+```
+
+---
 
 ## Usage/Examples
 
 1. Reading Excel
+
 ```java
 package cl.kanopus.excel;
 
 import cl.kanopus.excel.reader.ExcelReader;
 import cl.kanopus.excel.reader.RowProcess;
 import cl.kanopus.excel.reader.SheetEventListener;
+
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -51,11 +68,13 @@ public class ExcelReaderTest {
 ```
 
 2. Writing Excel
+
 ```java
 package cl.kanopus.excel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+
 import org.junit.jupiter.api.Test;
 import cl.kanopus.common.util.DesktopUtils;
 import cl.kanopus.common.util.FileUtils;
@@ -66,7 +85,7 @@ import cl.kanopus.excel.writer.KanopusExcel;
 public class ExcelWriterTest {
 
     @Test
-     public void generateExcelOneMillionRecords() throws Exception {
+    public void generateExcelOneMillionRecords() throws Exception {
         //1millon --> 11seconds --> 25 MB --> 5.000 in memory (default contructor)
 
         KanopusExcel excel = new KanopusExcel();
@@ -89,7 +108,7 @@ public class ExcelWriterTest {
             row.createCell(new Date());
             row.createCell(LocalDate.now());
             row.createCell(LocalDateTime.now());
-            row.createCell(i%2==0);
+            row.createCell(i % 2 == 0);
         }
 
         sheet.createFreezePane(0, 1);
@@ -109,7 +128,6 @@ public class ExcelWriterTest {
 ## Authors
 
 - [@pabloandres.diazsaavedra](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/)
-
 
 ## License
 
