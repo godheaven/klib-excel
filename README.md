@@ -1,4 +1,4 @@
-![Logo](https://www.kanopus.cl/admin/javax.faces.resource/images/logo-gray.png.xhtml?ln=paradise-layout)
+![Logo](https://www.kanopus.cl/assets/kanopus-grey.png)
 
 # klib-excel
 
@@ -19,7 +19,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
 	<groupId>cl.kanopus.util</groupId>
 	<artifactId>klib-excel</artifactId>
-	<version>3.58.0</version>
+	<version>3.59.0</version>
 </dependency>
 ```
 

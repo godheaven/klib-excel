@@ -100,8 +100,6 @@ class LoadValidatorTest {
 
         Assertions.assertEquals(Long.valueOf(1000), validator.parseMoneyToLong(hash, "data2", true));
         Assertions.assertEquals(Long.valueOf(1000), validator.parseMoneyToLong(hash, "data3", true));
-//        LoadValidatorException exception2 = Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "data4", true));
-//        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, exception2.getCode());
 
     }
 
