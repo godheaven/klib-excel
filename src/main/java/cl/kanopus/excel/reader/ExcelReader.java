@@ -2,7 +2,7 @@
  * !--
  * For support and inquiries regarding this library, please contact:
  *   soporte@kanopus.cl
- * 
+ *
  * Project website:
  *   https://www.kanopus.cl
  * %%
@@ -11,9 +11,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,9 +43,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  * File for HSSF testing/examples
  *
- * THIS IS NOT THE MAIN HSSF FILE!! This is a utility for testing functionality.
- * It does contain sample API usage that may be educational to regular API
- * users.
+ * <p>THIS IS NOT THE MAIN HSSF FILE!! This is a utility for testing functionality. It does contain
+ * sample API usage that may be educational to regular API users.
  */
 public final class ExcelReader {
 
@@ -74,7 +73,7 @@ public final class ExcelReader {
 
     public void processAllSheets(File file) throws ExcelReaderException {
         try {
-            try (FileInputStream fis = new FileInputStream(file);) {
+            try (FileInputStream fis = new FileInputStream(file); ) {
                 processAllSheets(fis, file.getName().toLowerCase().endsWith("xlsx"));
             }
 
@@ -114,7 +113,7 @@ public final class ExcelReader {
 
                             int countContent = 0;
                             DataFormatter formatter = new DataFormatter();
-                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
+                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
                                 try {
                                     Cell cell = cells.next();
 
@@ -123,14 +122,22 @@ public final class ExcelReader {
 
                                     if (r == listener.getStartProcess()) {
                                         if (value != null) {
-                                            hashTitles.put(key, titlesToUpperCase ? value.toUpperCase().trim() : value.trim());
+                                            hashTitles.put(
+                                                    key,
+                                                    titlesToUpperCase
+                                                            ? value.toUpperCase().trim()
+                                                            : value.trim());
                                         }
                                     } else {
-                                        countContent += (value != null && !value.trim().isEmpty()) ? 1 : 0;
-                                        hashRow.put(hashTitles.get(key), value != null ? value.trim() : null);
+                                        countContent +=
+                                                (value != null && !value.trim().isEmpty()) ? 1 : 0;
+                                        hashRow.put(
+                                                hashTitles.get(key),
+                                                value != null ? value.trim() : null);
                                     }
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            ex, row.getRowNum(), listener.getSheetName());
                                 }
                             }
 
@@ -139,17 +146,20 @@ public final class ExcelReader {
                                 try {
                                     listener.getRowProcess().process(hashRow);
                                 } catch (LoadValidatorException lve) {
-                                    throw new ExcelReaderException(lve, lve.getCode().getMessage(lve.getArgs()), row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            lve,
+                                            lve.getCode().getMessage(lve.getArgs()),
+                                            row.getRowNum(),
+                                            listener.getSheetName());
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            ex, row.getRowNum(), listener.getSheetName());
                                 }
                                 hashRow.clear();
                             }
                         }
                     }
-
                 }
-
             }
         } catch (ExcelReaderException ex) {
             throw ex;
@@ -178,7 +188,7 @@ public final class ExcelReader {
 
                             int countContent = 0;
                             DataFormatter formatter = new DataFormatter();
-                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
+                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
                                 try {
                                     Cell cell = cells.next();
 
@@ -187,14 +197,22 @@ public final class ExcelReader {
 
                                     if (r == listener.getStartProcess()) {
                                         if (value != null) {
-                                            hashTitles.put(key, titlesToUpperCase ? value.toUpperCase().trim() : value.trim());
+                                            hashTitles.put(
+                                                    key,
+                                                    titlesToUpperCase
+                                                            ? value.toUpperCase().trim()
+                                                            : value.trim());
                                         }
                                     } else {
-                                        countContent += (value != null && !value.trim().isEmpty()) ? 1 : 0;
-                                        hashRow.put(hashTitles.get(key), value != null ? value.trim() : null);
+                                        countContent +=
+                                                (value != null && !value.trim().isEmpty()) ? 1 : 0;
+                                        hashRow.put(
+                                                hashTitles.get(key),
+                                                value != null ? value.trim() : null);
                                     }
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            ex, row.getRowNum(), listener.getSheetName());
                                 }
                             }
 
@@ -203,17 +221,20 @@ public final class ExcelReader {
                                 try {
                                     listener.getRowProcess().process(hashRow);
                                 } catch (LoadValidatorException lve) {
-                                    throw new ExcelReaderException(lve, lve.getCode().getMessage(lve.getArgs()), row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            lve,
+                                            lve.getCode().getMessage(lve.getArgs()),
+                                            row.getRowNum(),
+                                            listener.getSheetName());
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(
+                                            ex, row.getRowNum(), listener.getSheetName());
                                 }
                                 hashRow.clear();
                             }
                         }
                     }
-
                 }
-
             }
         } catch (ExcelReaderException ex) {
             throw ex;
@@ -237,5 +258,4 @@ public final class ExcelReader {
     public void setTitlesToUpperCase(boolean titlesToUpperCase) {
         this.titlesToUpperCase = titlesToUpperCase;
     }
-
 }

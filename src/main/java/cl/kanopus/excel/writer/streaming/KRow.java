@@ -2,7 +2,7 @@
  * !--
  * For support and inquiries regarding this library, please contact:
  *   soporte@kanopus.cl
- * 
+ *
  * Project website:
  *   https://www.kanopus.cl
  * %%
@@ -11,9 +11,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -98,13 +98,23 @@ public class KRow {
         } else {
             cell.setCellValue(value == null ? "" : String.valueOf(value));
         }
-
     }
 
     private void setComment(SXSSFCell cell, String comment) {
         // Assign the comment to the cell
-        Comment cellcomment = cell.getSheet().createDrawingPatriarch().createCellComment(
-                new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
+        Comment cellcomment =
+                cell.getSheet()
+                        .createDrawingPatriarch()
+                        .createCellComment(
+                                new XSSFClientAnchor(
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        cell.getColumnIndex(),
+                                        cell.getRowIndex(),
+                                        cell.getColumnIndex() + 2,
+                                        cell.getRowIndex() + 3));
         RichTextString richText = excel.getFactory().createRichTextString(comment);
         cellcomment.setString(richText);
     }
@@ -119,17 +129,20 @@ public class KRow {
             if (style == null) {
                 cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATE.name());
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
+                cellStyle =
+                        excel.styles.get(
+                                KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
             }
         } else if (value instanceof LocalDateTime) {
             if (style == null) {
                 cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATETIME.name());
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
+                cellStyle =
+                        excel.styles.get(
+                                KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
             }
         }
 
         return cellStyle;
     }
-
 }

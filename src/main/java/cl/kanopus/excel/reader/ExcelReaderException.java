@@ -2,7 +2,7 @@
  * !--
  * For support and inquiries regarding this library, please contact:
  *   soporte@kanopus.cl
- * 
+ *
  * Project website:
  *   https://www.kanopus.cl
  * %%
@@ -11,9 +11,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,8 +25,8 @@ package cl.kanopus.excel.reader;
 
 public class ExcelReaderException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
-	private final int currentRow;
+    private static final long serialVersionUID = 1L;
+    private final int currentRow;
     private final String sheetName;
 
     public ExcelReaderException(Exception ex) {
@@ -54,5 +54,4 @@ public class ExcelReaderException extends RuntimeException {
     public String getSheetName() {
         return sheetName;
     }
-
 }

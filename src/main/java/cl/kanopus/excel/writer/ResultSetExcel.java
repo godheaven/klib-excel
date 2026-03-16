@@ -25,7 +25,6 @@ package cl.kanopus.excel.writer;
 
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
-
 import java.util.Iterator;
 import java.util.Map;
 
@@ -35,8 +34,7 @@ public class ResultSetExcel extends KanopusExcel {
     private boolean enableAutoFilter = true;
     private boolean enableFreezePane = true;
 
-    public ResultSetExcel() {
-    }
+    public ResultSetExcel() {}
 
     public ResultSetExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
         super(rowAccessWindowSize, compressTmpFiles);
@@ -69,7 +67,6 @@ public class ResultSetExcel extends KanopusExcel {
             for (Object value : p.values()) {
                 row.createCell(value, KanopusExcel.Style.TABLE_VALUE_NORMAL);
             }
-
         }
 
         if (enableAutoFilter) {
@@ -89,5 +86,4 @@ public class ResultSetExcel extends KanopusExcel {
     public void setEnableFreezePane(boolean enableFreezePane) {
         this.enableFreezePane = enableFreezePane;
     }
-
 }

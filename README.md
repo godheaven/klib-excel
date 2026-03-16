@@ -1,11 +1,15 @@
-![Logo](https://www.kanopus.cl/assets/kanopus-grey.png)
+<p align="left">
+  <img src="https://www.kanopus.cl/assets/kanopus_black.png" width="220"/>
+</p>
+
+![Maven](https://img.shields.io/maven-central/v/cl.kanopus.util/klib-excel) ![License](https://img.shields.io/badge/license-Apache%20License%202.0-blue) ![Java](https://img.shields.io/badge/java-17+-orange)
 
 # klib-excel
 
 This project is designed as a utility that allows you to generate Excel files in an easier way.
 This simplifies the way you interact with the POI library and reduces the amount of complex code for Excel generation.
 
-## Features
+## ✨ Features
 
 - Allows you to read excel files in a simplified way
 - Allows you to write excel files in a simplified way
@@ -19,13 +23,14 @@ Add the dependency to your `pom.xml`:
 <dependency>
 	<groupId>cl.kanopus.util</groupId>
 	<artifactId>klib-excel</artifactId>
-	<version>3.59.0</version>
+	<version>4.03.0</version>
 </dependency>
 ```
 
 ---
 
-## Usage/Examples
+## 🚀 Usage Guide
+
 
 1. Reading Excel
 
@@ -125,17 +130,21 @@ public class ExcelWriterTest {
 }
 ```
 
-## Authors
+## 👤 Author
 
-- [@pabloandres.diazsaavedra](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/)
+**Pablo Andrés Díaz Saavedra** — Founder of **Kanopus – Estrellas del Software**
 
-## License
+Kanopus builds tools and platforms that simplify software development and DevOps processes.
+
+[GitHub](https://github.com/godheaven) | [LinkedIn](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/) | [Website](https://kanopus.cl)
+
+## 📄 License
 
 This software is licensed under the Apache License, Version 2.0. See the LICENSE file for details.
 I hope you enjoy it.
 
 [![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://opensource.org/license/apache-2-0)
 
-## Support
+## 🛟 Support
 
-For support, email soporte@kanopus.cl
+For support or questions contact: 📧 [soporte@kanopus.cl](mailto:soporte@kanopus.cl)

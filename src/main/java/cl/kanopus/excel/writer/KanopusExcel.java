@@ -24,20 +24,18 @@
 package cl.kanopus.excel.writer;
 
 import cl.kanopus.excel.writer.streaming.KSheet;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 public class KanopusExcel {
 
     public enum Style {
-
         FONT_BLACK_BOLD,
         FONT_BLACK_NORMAL,
         FONT_RED_BOLD,
@@ -55,7 +53,6 @@ public class KanopusExcel {
         DEFAULT_VALUE_NORMAL,
         DEFAULT_VALUE_NORMAL_DATE,
         DEFAULT_VALUE_NORMAL_DATETIME,
-
     }
 
     public final Map<String, CellStyle> styles = new HashMap<>();
@@ -71,7 +68,8 @@ public class KanopusExcel {
     }
 
     public KanopusExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
-        this.wb = new SXSSFWorkbook(new XSSFWorkbook(), rowAccessWindowSize, compressTmpFiles, false);
+        this.wb =
+                new SXSSFWorkbook(new XSSFWorkbook(), rowAccessWindowSize, compressTmpFiles, false);
         this.factory = this.wb.getCreationHelper();
         createStyles(this.wb);
     }
@@ -94,32 +92,84 @@ public class KanopusExcel {
     }
 
     /**
-     * Cell styles used for formatting sheets. These styles will be stored in
-     * memory, in this way it is not necessary to create for each call.
+     * Cell styles used for formatting sheets. These styles will be stored in memory, in this way it
+     * is not necessary to create for each call.
      */
     private void createStyles(SXSSFWorkbook workbook) {
         if (styles.isEmpty()) {
 
-            short dateFormat = workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy");
-            short dateTimeFormat = workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy HH:mm");
+            short dateFormat =
+                    workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy");
+            short dateTimeFormat =
+                    workbook.getCreationHelper().createDataFormat().getFormat("dd-MMM-yyyy HH:mm");
 
             /* Style TABLE_TITLE */
-            styles.put(Style.TABLE_TITLE_NORMAL.name(), createStyle(workbook, true, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.GREY_25_PERCENT.getIndex()));
-            styles.put(Style.TABLE_TITLE_INFO.name(), createStyle(workbook, true, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.LIGHT_TURQUOISE.getIndex()));
-            styles.put(Style.TABLE_TITLE_REQUIRED.name(), createStyle(workbook, true, Font.COLOR_RED, HSSFColor.HSSFColorPredefined.YELLOW.getIndex()));
-            styles.put(Style.TABLE_TITLE_OPTIONAL.name(), createStyle(workbook, true, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.YELLOW.getIndex()));
+            styles.put(
+                    Style.TABLE_TITLE_NORMAL.name(),
+                    createStyle(
+                            workbook,
+                            true,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.GREY_25_PERCENT.getIndex()));
+            styles.put(
+                    Style.TABLE_TITLE_INFO.name(),
+                    createStyle(
+                            workbook,
+                            true,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.LIGHT_TURQUOISE.getIndex()));
+            styles.put(
+                    Style.TABLE_TITLE_REQUIRED.name(),
+                    createStyle(
+                            workbook,
+                            true,
+                            Font.COLOR_RED,
+                            HSSFColor.HSSFColorPredefined.YELLOW.getIndex()));
+            styles.put(
+                    Style.TABLE_TITLE_OPTIONAL.name(),
+                    createStyle(
+                            workbook,
+                            true,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.YELLOW.getIndex()));
 
             /* Style TABLE_VALUE */
             styles.put(DefaultStyle.DEFAULT_DATE.name(), createStyle(workbook, dateFormat));
             styles.put(DefaultStyle.DEFAULT_DATETIME.name(), createStyle(workbook, dateTimeFormat));
 
             /* VALUE NORMAL */
-            styles.put(Style.TABLE_VALUE_NORMAL.name(), createStyle(workbook, false, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.WHITE.getIndex()));
-            styles.put(DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name(), createStyle(workbook, false, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.WHITE.getIndex(), dateFormat));
-            styles.put(DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name(), createStyle(workbook, false, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.WHITE.getIndex(), dateTimeFormat));
+            styles.put(
+                    Style.TABLE_VALUE_NORMAL.name(),
+                    createStyle(
+                            workbook,
+                            false,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.WHITE.getIndex()));
+            styles.put(
+                    DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name(),
+                    createStyle(
+                            workbook,
+                            false,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.WHITE.getIndex(),
+                            dateFormat));
+            styles.put(
+                    DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name(),
+                    createStyle(
+                            workbook,
+                            false,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.WHITE.getIndex(),
+                            dateTimeFormat));
 
             /* VALUE INSERT */
-            styles.put(Style.TABLE_VALUE_INSERT.name(), createStyle(workbook, false, Font.COLOR_NORMAL, HSSFColor.HSSFColorPredefined.LIGHT_YELLOW.getIndex()));
+            styles.put(
+                    Style.TABLE_VALUE_INSERT.name(),
+                    createStyle(
+                            workbook,
+                            false,
+                            Font.COLOR_NORMAL,
+                            HSSFColor.HSSFColorPredefined.LIGHT_YELLOW.getIndex()));
 
             /* Style FONT_BLACK_BOLD */
             CellStyle style;
@@ -146,14 +196,19 @@ public class KanopusExcel {
             style.setFont(font);
             styles.put(Style.FONT_RED_BOLD.name(), style);
         }
-
     }
 
-    private CellStyle createStyle(SXSSFWorkbook workbook, boolean bold, short fontColor, short backgroundColor) {
+    private CellStyle createStyle(
+            SXSSFWorkbook workbook, boolean bold, short fontColor, short backgroundColor) {
         return createStyle(workbook, bold, fontColor, backgroundColor, null);
     }
 
-    private CellStyle createStyle(SXSSFWorkbook workbook, boolean bold, short fontColor, short backgroundColor, Short format) {
+    private CellStyle createStyle(
+            SXSSFWorkbook workbook,
+            boolean bold,
+            short fontColor,
+            short backgroundColor,
+            Short format) {
         Font font = workbook.createFont();
         font.setBold(bold);
         font.setColor(fontColor);

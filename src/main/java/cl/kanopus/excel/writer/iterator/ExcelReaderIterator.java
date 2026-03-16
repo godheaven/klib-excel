@@ -25,7 +25,6 @@ package cl.kanopus.excel.writer.iterator;
 
 import cl.kanopus.common.data.Paginator;
 import cl.kanopus.common.data.Searcher;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

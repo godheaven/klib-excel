@@ -26,7 +26,6 @@ package cl.kanopus.excel.writer.iterator;
 import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
-
 import java.util.List;
 
 class RecordsExcel extends KanopusExcel {
@@ -84,5 +83,4 @@ class RecordsExcel extends KanopusExcel {
     public int getTotalRecords() {
         return totalRecords;
     }
-
 }
