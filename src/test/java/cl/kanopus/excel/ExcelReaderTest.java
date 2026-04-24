@@ -38,15 +38,12 @@ class ExcelReaderTest {
     void readExcel() throws Exception {
 
         ExcelReader reader = new ExcelReader();
-        reader.addListener(
-                new SheetEventListener(
-                        "RECORDS",
-                        new RowProcess() {
-                            @Override
-                            public void process(HashMap<String, String> row) throws Exception {
-                                System.out.println("row-->" + row);
-                            }
-                        }));
+        reader.addListener(new SheetEventListener("RECORDS", new RowProcess() {
+            @Override
+            public void process(HashMap<String, String> row) throws Exception {
+                System.out.println("row-->" + row);
+            }
+        }));
 
         URL resource = ExcelReaderTest.class.getClassLoader().getResource("test_reader.xls");
         reader.processAllSheets(new File(resource.getFile()));
@@ -59,15 +56,12 @@ class ExcelReaderTest {
     void readExcelXlsx() throws Exception {
 
         ExcelReader reader = new ExcelReader();
-        reader.addListener(
-                new SheetEventListener(
-                        "RECORDS",
-                        new RowProcess() {
-                            @Override
-                            public void process(HashMap<String, String> row) throws Exception {
-                                System.out.println("row-->" + row);
-                            }
-                        }));
+        reader.addListener(new SheetEventListener("RECORDS", new RowProcess() {
+            @Override
+            public void process(HashMap<String, String> row) throws Exception {
+                System.out.println("row-->" + row);
+            }
+        }));
 
         URL resource = ExcelReaderTest.class.getClassLoader().getResource("test_reader.xlsx");
         reader.processAllSheets(new File(resource.getFile()));

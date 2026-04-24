@@ -50,24 +50,20 @@ public class LoadValidator {
         }
     }
 
-    public Date parseDate(
-            Map<String, String> hash, String key, boolean required, String pattern, int maxLength)
-            throws LoadValidatorException {
+    public Date parseDate(Map<String, String> hash, String key, boolean required, String pattern, int maxLength) throws LoadValidatorException {
         String dateString = parseString(hash, key, required, maxLength);
 
         Date date = null;
         if (dateString != null) {
             date = Utils.getDate(dateString, pattern);
             if (date == null) {
-                throw new LoadValidatorException(
-                        ErrorCode.VALUE_DATE_FORMAT_EXCEPTION, key, pattern);
+                throw new LoadValidatorException(ErrorCode.VALUE_DATE_FORMAT_EXCEPTION, key, pattern);
             }
         }
         return date;
     }
 
-    public Long parseMoneyToLong(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public Long parseMoneyToLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -75,15 +71,9 @@ public class LoadValidator {
         try {
             Long value = null;
             if (!Utils.isNullOrEmpty(data)) {
-                value =
-                        Long.valueOf(
-                                data.replaceAll("\\$", "")
-                                        .replaceAll("\\.", "")
-                                        .replaceAll(",", "")
-                                        .trim());
+                value = Long.valueOf(data.replaceAll("\\$", "").replaceAll("\\.", "").replaceAll(",", "").trim());
                 if (value < 0) {
-                    throw new LoadValidatorException(
-                            ErrorCode.VALUE_NUMBER_NEGATIVE_EXCEPTION, key);
+                    throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_NEGATIVE_EXCEPTION, key);
                 }
             }
             return value;
@@ -92,8 +82,7 @@ public class LoadValidator {
         }
     }
 
-    public Long parseLong(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public Long parseLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -105,8 +94,7 @@ public class LoadValidator {
         }
     }
 
-    public Integer parseInteger(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public Integer parseInteger(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -118,31 +106,19 @@ public class LoadValidator {
         }
     }
 
-    public String parseStringCutoff(
-            Map<String, String> hash, String key, boolean required, int maxLength)
-            throws LoadValidatorException {
+    public String parseStringCutoff(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
         return parseString(hash, key, required, maxLength, null, true);
     }
 
-    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength)
-            throws LoadValidatorException {
+    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
         return parseString(hash, key, required, maxLength, null, false);
     }
 
-    public String parseString(
-            Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex)
-            throws LoadValidatorException {
+    public String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex) throws LoadValidatorException {
         return parseString(hash, key, required, maxLength, regex, false);
     }
 
-    private String parseString(
-            Map<String, String> hash,
-            String key,
-            boolean required,
-            int maxLength,
-            REGEX regex,
-            boolean cutoff)
-            throws LoadValidatorException {
+    private String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex, boolean cutoff) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -162,8 +138,7 @@ public class LoadValidator {
         return (data == null) ? "" : data.trim();
     }
 
-    public Boolean parseBoolean(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public Boolean parseBoolean(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
         if (required) {
             validateRequired(data, key);
@@ -172,8 +147,7 @@ public class LoadValidator {
         return data == null ? null : ("true".equalsIgnoreCase(data) || "si".equalsIgnoreCase(data));
     }
 
-    public String parseRut(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public String parseRut(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = parseString(hash, key, required, 100);
         if (!Utils.isNullOrEmpty(data) && !Utils.isRut(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_RUT_FORMAT_EXCEPTION, key);
@@ -181,8 +155,7 @@ public class LoadValidator {
         return !Utils.isNullOrEmpty(data) ? data.toUpperCase() : null;
     }
 
-    public String parseGTIN(Map<String, String> hash, String key, boolean required)
-            throws LoadValidatorException {
+    public String parseGTIN(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = parseString(hash, key, required, 14);
         if (!Utils.isNullOrEmpty(data) && !Utils.isGTIN(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_GTIN_FORMAT_EXCEPTION, key);
@@ -198,13 +171,11 @@ public class LoadValidator {
 
     public void validaRegex(String data, REGEX regex, String label) throws LoadValidatorException {
         if (data != null && !data.isEmpty() && !Pattern.matches(regex.getExpression(), data)) {
-            throw new LoadValidatorException(
-                    ErrorCode.VALUE_VIOLATES_REGEX, label, regex.getExpression());
+            throw new LoadValidatorException(ErrorCode.VALUE_VIOLATES_REGEX, label, regex.getExpression());
         }
     }
 
-    public void validateMaxlength(String data, int maxLength, String label)
-            throws LoadValidatorException {
+    public void validateMaxlength(String data, int maxLength, String label) throws LoadValidatorException {
         if (data != null && data.length() > maxLength) {
             throw new LoadValidatorException(ErrorCode.VALUE_VIOLATES_MAXLENGTH, label, maxLength);
         }

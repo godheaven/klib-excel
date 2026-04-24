@@ -30,7 +30,8 @@ import lombok.Getter;
 @Getter
 public class LoadValidatorException extends Exception {
 
-    @Serial private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final ErrorCode code;
     private final transient Object[] args;
 
@@ -49,18 +50,13 @@ public class LoadValidatorException extends Exception {
     public enum ErrorCode {
         VALUE_NUMBER_FORMAT_EXCEPTION("El valor del campo [{0}] debe ser numerico."),
         VALUE_NUMBER_NEGATIVE_EXCEPTION("El valor del campo [{0}] debe ser positivo."),
-        VALUE_RUT_FORMAT_EXCEPTION(
-                "El valor del campo [{0}] no tiene un rut válido.\nEjemplo: 99999999-9"),
-        VALUE_GTIN_FORMAT_EXCEPTION(
-                "El valor del campo [{0}] no tiene un formato GTIN válido.\nGlobal Trade Item Number"),
+        VALUE_RUT_FORMAT_EXCEPTION("El valor del campo [{0}] no tiene un rut válido.\nEjemplo: 99999999-9"),
+        VALUE_GTIN_FORMAT_EXCEPTION("El valor del campo [{0}] no tiene un formato GTIN válido.\nGlobal Trade Item Number"),
         VALUE_REQUIRED("El valor del campo [{0}] es requerido"),
         VALUE_VIOLATES_REGEX("El valor del campo [{0}] no cumple con los valores permitidos."),
-        VALUE_VIOLATES_MAXLENGTH(
-                "El valor del campo [{0}] excede el máximo permitido de {1} caracteres."),
-        RECORD_DOES_NOT_EXIST_IN_DATABASE(
-                "El valor del campo [{0}] no existe en la base de datos."),
-        VALUE_DATE_FORMAT_EXCEPTION(
-                "El valor del campo [{0}] no tiene un formato de fecha valido {1}\nEjemplo: 11-ENERO-2016"),
+        VALUE_VIOLATES_MAXLENGTH("El valor del campo [{0}] excede el máximo permitido de {1} caracteres."),
+        RECORD_DOES_NOT_EXIST_IN_DATABASE("El valor del campo [{0}] no existe en la base de datos."),
+        VALUE_DATE_FORMAT_EXCEPTION("El valor del campo [{0}] no tiene un formato de fecha valido {1}\nEjemplo: 11-ENERO-2016"),
         RECORD_DUPLICATED("El registro {0} se encuentra duplicado en la hoja");
 
         private final String message;

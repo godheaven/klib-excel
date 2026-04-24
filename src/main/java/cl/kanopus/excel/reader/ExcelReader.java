@@ -43,8 +43,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  * File for HSSF testing/examples
  *
- * <p>THIS IS NOT THE MAIN HSSF FILE!! This is a utility for testing functionality. It does contain
- * sample API usage that may be educational to regular API users.
+ * <p>
+ * THIS IS NOT THE MAIN HSSF FILE!! This is a utility for testing functionality. It does contain sample API usage that may be educational to regular API users.
  */
 public final class ExcelReader {
 
@@ -73,7 +73,7 @@ public final class ExcelReader {
 
     public void processAllSheets(File file) throws ExcelReaderException {
         try {
-            try (FileInputStream fis = new FileInputStream(file); ) {
+            try (FileInputStream fis = new FileInputStream(file);) {
                 processAllSheets(fis, file.getName().toLowerCase().endsWith("xlsx"));
             }
 
@@ -113,7 +113,7 @@ public final class ExcelReader {
 
                             int countContent = 0;
                             DataFormatter formatter = new DataFormatter();
-                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
+                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
                                 try {
                                     Cell cell = cells.next();
 
@@ -122,22 +122,14 @@ public final class ExcelReader {
 
                                     if (r == listener.getStartProcess()) {
                                         if (value != null) {
-                                            hashTitles.put(
-                                                    key,
-                                                    titlesToUpperCase
-                                                            ? value.toUpperCase().trim()
-                                                            : value.trim());
+                                            hashTitles.put(key, titlesToUpperCase ? value.toUpperCase().trim() : value.trim());
                                         }
                                     } else {
-                                        countContent +=
-                                                (value != null && !value.trim().isEmpty()) ? 1 : 0;
-                                        hashRow.put(
-                                                hashTitles.get(key),
-                                                value != null ? value.trim() : null);
+                                        countContent += (value != null && !value.trim().isEmpty()) ? 1 : 0;
+                                        hashRow.put(hashTitles.get(key), value != null ? value.trim() : null);
                                     }
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(
-                                            ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
                                 }
                             }
 
@@ -146,14 +138,9 @@ public final class ExcelReader {
                                 try {
                                     listener.getRowProcess().process(hashRow);
                                 } catch (LoadValidatorException lve) {
-                                    throw new ExcelReaderException(
-                                            lve,
-                                            lve.getCode().getMessage(lve.getArgs()),
-                                            row.getRowNum(),
-                                            listener.getSheetName());
+                                    throw new ExcelReaderException(lve, lve.getCode().getMessage(lve.getArgs()), row.getRowNum(), listener.getSheetName());
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(
-                                            ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
                                 }
                                 hashRow.clear();
                             }
@@ -188,7 +175,7 @@ public final class ExcelReader {
 
                             int countContent = 0;
                             DataFormatter formatter = new DataFormatter();
-                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext(); ) {
+                            for (Iterator<Cell> cells = row.cellIterator(); cells.hasNext();) {
                                 try {
                                     Cell cell = cells.next();
 
@@ -197,22 +184,14 @@ public final class ExcelReader {
 
                                     if (r == listener.getStartProcess()) {
                                         if (value != null) {
-                                            hashTitles.put(
-                                                    key,
-                                                    titlesToUpperCase
-                                                            ? value.toUpperCase().trim()
-                                                            : value.trim());
+                                            hashTitles.put(key, titlesToUpperCase ? value.toUpperCase().trim() : value.trim());
                                         }
                                     } else {
-                                        countContent +=
-                                                (value != null && !value.trim().isEmpty()) ? 1 : 0;
-                                        hashRow.put(
-                                                hashTitles.get(key),
-                                                value != null ? value.trim() : null);
+                                        countContent += (value != null && !value.trim().isEmpty()) ? 1 : 0;
+                                        hashRow.put(hashTitles.get(key), value != null ? value.trim() : null);
                                     }
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(
-                                            ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
                                 }
                             }
 
@@ -221,14 +200,9 @@ public final class ExcelReader {
                                 try {
                                     listener.getRowProcess().process(hashRow);
                                 } catch (LoadValidatorException lve) {
-                                    throw new ExcelReaderException(
-                                            lve,
-                                            lve.getCode().getMessage(lve.getArgs()),
-                                            row.getRowNum(),
-                                            listener.getSheetName());
+                                    throw new ExcelReaderException(lve, lve.getCode().getMessage(lve.getArgs()), row.getRowNum(), listener.getSheetName());
                                 } catch (Exception ex) {
-                                    throw new ExcelReaderException(
-                                            ex, row.getRowNum(), listener.getSheetName());
+                                    throw new ExcelReaderException(ex, row.getRowNum(), listener.getSheetName());
                                 }
                                 hashRow.clear();
                             }

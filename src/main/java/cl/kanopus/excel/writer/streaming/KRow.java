@@ -102,19 +102,8 @@ public class KRow {
 
     private void setComment(SXSSFCell cell, String comment) {
         // Assign the comment to the cell
-        Comment cellcomment =
-                cell.getSheet()
-                        .createDrawingPatriarch()
-                        .createCellComment(
-                                new XSSFClientAnchor(
-                                        0,
-                                        0,
-                                        0,
-                                        0,
-                                        cell.getColumnIndex(),
-                                        cell.getRowIndex(),
-                                        cell.getColumnIndex() + 2,
-                                        cell.getRowIndex() + 3));
+        Comment cellcomment = cell.getSheet().createDrawingPatriarch()
+                .createCellComment(new XSSFClientAnchor(0, 0, 0, 0, cell.getColumnIndex(), cell.getRowIndex(), cell.getColumnIndex() + 2, cell.getRowIndex() + 3));
         RichTextString richText = excel.getFactory().createRichTextString(comment);
         cellcomment.setString(richText);
     }
@@ -129,17 +118,13 @@ public class KRow {
             if (style == null) {
                 cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATE.name());
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle =
-                        excel.styles.get(
-                                KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
             }
         } else if (value instanceof LocalDateTime) {
             if (style == null) {
                 cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATETIME.name());
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle =
-                        excel.styles.get(
-                                KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
+                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
             }
         }
 

@@ -34,7 +34,8 @@ public class ResultSetExcel extends KanopusExcel {
     private boolean enableAutoFilter = true;
     private boolean enableFreezePane = true;
 
-    public ResultSetExcel() {}
+    public ResultSetExcel() {
+    }
 
     public ResultSetExcel(int rowAccessWindowSize, boolean compressTmpFiles) {
         super(rowAccessWindowSize, compressTmpFiles);
