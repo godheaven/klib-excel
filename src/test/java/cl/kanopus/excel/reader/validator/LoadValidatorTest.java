@@ -72,6 +72,13 @@ class LoadValidatorTest {
             validator.parseDate(hash, "fecha2", true, "dd-MM-yyyy", 10);
         });
         Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_DATE_FORMAT_EXCEPTION, ex.getCode());
+
+        // optional empty or missing dates are null
+        hash.put("fecha3", "");
+        Assertions.assertNull(validator.parseDate(hash, "fecha3", false, "dd-MM-yyyy", 10));
+        Assertions.assertNull(validator.parseDate(hash, "missing", false, "dd-MM-yyyy", 10));
+        ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseDate(hash, "fecha3", true, "dd-MM-yyyy", 10));
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_REQUIRED, ex.getCode());
     }
 
     /** Test of parseMoneyToLong method, of class LoadValidator. */
@@ -91,6 +98,39 @@ class LoadValidatorTest {
 
         Assertions.assertEquals(Long.valueOf(1000), validator.parseMoneyToLong(hash, "data2", true));
         Assertions.assertEquals(Long.valueOf(1000), validator.parseMoneyToLong(hash, "data3", true));
+
+        // decimals are rejected by default (no more silent 1000.3 -> 10003)
+        LoadValidatorException ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "data4", true));
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, ex.getCode());
+
+        hash.put("clp", "$ 1.234.567");
+        hash.put("zeroDecimals", "$120,00");
+        hash.put("decimalComma", "1.000,6");
+        hash.put("usFormat", "1,234.50");
+        hash.put("usGrouping", "1,000,000");
+        hash.put("zero", "0");
+        hash.put("empty", " ");
+        hash.put("text", "abc");
+        hash.put("huge", "99999999999999999999");
+        Assertions.assertEquals(Long.valueOf(1234567), validator.parseMoneyToLong(hash, "clp", true));
+        Assertions.assertEquals(Long.valueOf(120), validator.parseMoneyToLong(hash, "zeroDecimals", true));
+        Assertions.assertEquals(Long.valueOf(1000000), validator.parseMoneyToLong(hash, "usGrouping", true));
+        Assertions.assertEquals(Long.valueOf(0), validator.parseMoneyToLong(hash, "zero", true));
+        Assertions.assertNull(validator.parseMoneyToLong(hash, "empty", false));
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION,
+                Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "decimalComma", true)).getCode());
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION,
+                Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "text", true)).getCode());
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION,
+                Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "huge", true)).getCode());
+        Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_REQUIRED,
+                Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseMoneyToLong(hash, "empty", true)).getCode());
+
+        // explicit rounding
+        validator.setMoneyRoundingMode(java.math.RoundingMode.HALF_UP);
+        Assertions.assertEquals(Long.valueOf(1000), validator.parseMoneyToLong(hash, "data4", true));
+        Assertions.assertEquals(Long.valueOf(1001), validator.parseMoneyToLong(hash, "decimalComma", true));
+        Assertions.assertEquals(Long.valueOf(1235), validator.parseMoneyToLong(hash, "usFormat", true));
     }
 
     /** Test of parseLong method, of class LoadValidator. */
@@ -107,6 +147,12 @@ class LoadValidatorTest {
         Assertions.assertNull(validator.parseLong(hash, "l2", false));
         LoadValidatorException ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseLong(hash, "l3", true));
         Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, ex.getCode());
+
+        hash.put("l4", " 12 ");
+        hash.put("l5", "0");
+        Assertions.assertEquals(Long.valueOf(12L), validator.parseLong(hash, "l4", true));
+        Assertions.assertEquals(Long.valueOf(0L), validator.parseLong(hash, "l5", true));
+        Assertions.assertNull(validator.parseLong(hash, "missing", false));
     }
 
     /** Test of parseInteger method, of class LoadValidator. */
@@ -149,6 +195,9 @@ class LoadValidatorTest {
         Assertions.assertTrue(validator.parseBoolean(hash, "b1", true));
         Assertions.assertTrue(validator.parseBoolean(hash, "b2", true));
         Assertions.assertFalse(validator.parseBoolean(hash, "b3", true));
+        hash.put("b4", "");
+        Assertions.assertNull(validator.parseBoolean(hash, "b4", false));
+        Assertions.assertNull(validator.parseBoolean(hash, "missing", false));
     }
 
     /** Test of parseString method, of class LoadValidator. */
@@ -182,6 +231,12 @@ class LoadValidatorTest {
         Assertions.assertEquals("12345678-5", validator.parseRut(hash, "rut1", true));
         LoadValidatorException ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.parseRut(hash, "rut2", true));
         Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_RUT_FORMAT_EXCEPTION, ex.getCode());
+        Assertions.assertNull(validator.parseRut(hash, "missing", false));
+
+        // default upper-case keys
+        LoadValidator upper = new LoadValidator();
+        Map<String, String> row = Map.of("RUT", "12345678-5");
+        Assertions.assertEquals("12345678-5", upper.parseRut(row, "rut", true));
     }
 
     /** Test of parseGTIN method, of class LoadValidator. */
@@ -209,9 +264,11 @@ class LoadValidatorTest {
         ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.validateRequired("", "label"));
         Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_REQUIRED, ex.getCode());
 
-        // '0' is considered required fail per impl
-        ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.validateRequired("0", "label"));
+        ex = Assertions.assertThrows(LoadValidatorException.class, () -> validator.validateRequired("   ", "label"));
         Assertions.assertEquals(LoadValidatorException.ErrorCode.VALUE_REQUIRED, ex.getCode());
+
+        // since 4.20.0 '0' is a valid value
+        Assertions.assertDoesNotThrow(() -> validator.validateRequired("0", "label"));
     }
 
     /** Test of validaRegex method, of class LoadValidator. */

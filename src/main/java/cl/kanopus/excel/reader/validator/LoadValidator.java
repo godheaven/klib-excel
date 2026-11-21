@@ -25,17 +25,33 @@ package cl.kanopus.excel.reader.validator;
 
 import cl.kanopus.common.util.Utils;
 import cl.kanopus.excel.reader.validator.LoadValidatorException.ErrorCode;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Helpers to validate and convert the values of a row read by {@link cl.kanopus.excel.reader.ExcelReader}.
+ *
+ * <p>
+ * Null/blank handling: a missing key, {@code null} or a blank value is considered "empty". Required validations fail for empty values; non-required parsers return {@code null} for empty values, except the {@code parseString*} methods which return {@code ""} (kept for backward compatibility).
+ */
 @Setter
 @Getter
 public class LoadValidator {
 
+    private static final Pattern DOT_GROUPING = Pattern.compile("^\\d{1,3}(\\.\\d{3})+$");
+
     private boolean titlesToUpperCase = true;
+
+    /**
+     * Rounding applied by {@link #parseMoneyToLong(Map, String, boolean)} to amounts with a fractional part. {@code null} (default) rejects amounts with non-zero decimals with {@link ErrorCode#VALUE_NUMBER_FORMAT_EXCEPTION}.
+     */
+    private RoundingMode moneyRoundingMode;
 
     @Getter
     public enum REGEX {
@@ -50,11 +66,28 @@ public class LoadValidator {
         }
     }
 
+    private String get(Map<String, String> hash, String key) {
+        return hash.get(titlesToUpperCase ? key.toUpperCase(Locale.ROOT) : key);
+    }
+
+    private static boolean isBlank(String data) {
+        return data == null || data.trim().isEmpty();
+    }
+
+    private String getRequired(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
+        String data = get(hash, key);
+        if (required) {
+            validateRequired(data, key);
+        }
+        return isBlank(data) ? null : data.trim();
+    }
+
+    /** Parses a date; returns {@code null} when the value is empty and not required. */
     public Date parseDate(Map<String, String> hash, String key, boolean required, String pattern, int maxLength) throws LoadValidatorException {
         String dateString = parseString(hash, key, required, maxLength);
 
         Date date = null;
-        if (dateString != null) {
+        if (!dateString.isEmpty()) {
             date = Utils.getDate(dateString, pattern);
             if (date == null) {
                 throw new LoadValidatorException(ErrorCode.VALUE_DATE_FORMAT_EXCEPTION, key, pattern);
@@ -63,44 +96,70 @@ public class LoadValidator {
         return date;
     }
 
+    /**
+     * Parses a money amount using the Chilean format: {@code "$"} and spaces are ignored, {@code "."} is the thousands separator and {@code ","} the decimal separator (e.g. {@code "$ 1.234.567"} or {@code "1.234,00"}). For values produced by Excel itself, a single {@code "."} not followed by groups of
+     * exactly three digits (e.g. {@code "1000.3"}) is read as a decimal separator, and when both separators are present the last one is the decimal separator.
+     *
+     * <p>
+     * Amounts with non-zero decimals are rejected unless {@link #setMoneyRoundingMode(RoundingMode)} is configured. Negative amounts are rejected.
+     */
     public Long parseMoneyToLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
-        if (required) {
-            validateRequired(data, key);
+        String data = getRequired(hash, key, required);
+        if (data == null) {
+            return null;
+        }
+        BigDecimal amount = parseAmount(data.replace("$", "").replace(" ", "").replace("\u00a0", ""), key);
+        if (amount.signum() < 0) {
+            throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_NEGATIVE_EXCEPTION, key);
         }
         try {
-            Long value = null;
-            if (!Utils.isNullOrEmpty(data)) {
-                value = Long.valueOf(data.replaceAll("\\$", "").replaceAll("\\.", "").replaceAll(",", "").trim());
-                if (value < 0) {
-                    throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_NEGATIVE_EXCEPTION, key);
+            if (amount.stripTrailingZeros().scale() > 0) {
+                if (moneyRoundingMode == null) {
+                    throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
                 }
+                amount = amount.setScale(0, moneyRoundingMode);
             }
-            return value;
+            return amount.longValueExact();
+        } catch (ArithmeticException ae) {
+            throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
+        }
+    }
+
+    private static BigDecimal parseAmount(String value, String key) throws LoadValidatorException {
+        int lastDot = value.lastIndexOf('.');
+        int lastComma = value.lastIndexOf(',');
+        String normalized;
+        if (lastDot >= 0 && lastComma >= 0) {
+            char decimal = lastComma > lastDot ? ',' : '.';
+            char grouping = decimal == ',' ? '.' : ',';
+            normalized = value.replace(String.valueOf(grouping), "").replace(decimal, '.');
+        } else if (lastComma >= 0) {
+            normalized = value.indexOf(',') == lastComma ? value.replace(',', '.') : value.replace(",", "");
+        } else if (lastDot >= 0) {
+            normalized = DOT_GROUPING.matcher(value.startsWith("-") ? value.substring(1) : value).matches() ? value.replace(".", "") : value;
+        } else {
+            normalized = value;
+        }
+        try {
+            return new BigDecimal(normalized);
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
     }
 
     public Long parseLong(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
-        if (required) {
-            validateRequired(data, key);
-        }
+        String data = getRequired(hash, key, required);
         try {
-            return (data == null || data.isEmpty()) ? null : Long.valueOf(data);
+            return data == null ? null : Long.valueOf(data);
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
     }
 
     public Integer parseInteger(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
-        if (required) {
-            validateRequired(data, key);
-        }
+        String data = getRequired(hash, key, required);
         try {
-            return (data == null || data.isEmpty()) ? null : Integer.valueOf(data);
+            return data == null ? null : Integer.valueOf(data);
         } catch (NumberFormatException ne) {
             throw new LoadValidatorException(ErrorCode.VALUE_NUMBER_FORMAT_EXCEPTION, key);
         }
@@ -110,6 +169,7 @@ public class LoadValidator {
         return parseString(hash, key, required, maxLength, null, true);
     }
 
+    /** Returns the trimmed value, or {@code ""} when it is empty. */
     public String parseString(Map<String, String> hash, String key, boolean required, int maxLength) throws LoadValidatorException {
         return parseString(hash, key, required, maxLength, null, false);
     }
@@ -119,10 +179,7 @@ public class LoadValidator {
     }
 
     private String parseString(Map<String, String> hash, String key, boolean required, int maxLength, REGEX regex, boolean cutoff) throws LoadValidatorException {
-        String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
-        if (required) {
-            validateRequired(data, key);
-        }
+        String data = getRequired(hash, key, required);
 
         if (cutoff) {
             if (data != null && data.length() > maxLength) {
@@ -135,36 +192,34 @@ public class LoadValidator {
         if (regex != null) {
             validaRegex(data, regex, key);
         }
-        return (data == null) ? "" : data.trim();
+        return (data == null) ? "" : data;
     }
 
+    /** {@code "true"} and {@code "si"} (ignoring case) are true, other values false; empty values return {@code null}. */
     public Boolean parseBoolean(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
-        String data = hash.get(titlesToUpperCase ? key.toUpperCase() : key);
-        if (required) {
-            validateRequired(data, key);
-        }
-
+        String data = getRequired(hash, key, required);
         return data == null ? null : ("true".equalsIgnoreCase(data) || "si".equalsIgnoreCase(data));
     }
 
     public String parseRut(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = parseString(hash, key, required, 100);
-        if (!Utils.isNullOrEmpty(data) && !Utils.isRut(data)) {
+        if (!data.isEmpty() && !Utils.isRut(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_RUT_FORMAT_EXCEPTION, key);
         }
-        return !Utils.isNullOrEmpty(data) ? data.toUpperCase() : null;
+        return !data.isEmpty() ? data.toUpperCase(Locale.ROOT) : null;
     }
 
     public String parseGTIN(Map<String, String> hash, String key, boolean required) throws LoadValidatorException {
         String data = parseString(hash, key, required, 14);
-        if (!Utils.isNullOrEmpty(data) && !Utils.isGTIN(data)) {
+        if (!data.isEmpty() && !Utils.isGTIN(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_GTIN_FORMAT_EXCEPTION, key);
         }
-        return !Utils.isNullOrEmpty(data) ? data.toUpperCase() : null;
+        return !data.isEmpty() ? data.toUpperCase(Locale.ROOT) : null;
     }
 
+    /** Fails when the value is {@code null}, empty or blank. Since 4.20.0 {@code "0"} is a valid value. */
     public void validateRequired(String data, String label) throws LoadValidatorException {
-        if (data == null || data.isEmpty() || "0".equals(data)) {
+        if (isBlank(data)) {
             throw new LoadValidatorException(ErrorCode.VALUE_REQUIRED, label);
         }
     }
