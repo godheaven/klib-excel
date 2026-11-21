@@ -29,6 +29,12 @@ public class ExcelReaderException extends RuntimeException {
     private final int currentRow;
     private final String sheetName;
 
+    public ExcelReaderException(String message) {
+        super(message);
+        this.currentRow = 0;
+        this.sheetName = "";
+    }
+
     public ExcelReaderException(Exception ex) {
         super(ex);
         this.currentRow = 0;
