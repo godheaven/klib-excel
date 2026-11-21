@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cl.kanopus</groupId>
 		<artifactId>kanopus-core-parent</artifactId>
-		<version>4.06.3</version>
+		<version>4.20.0</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -14,6 +14,15 @@
 	<artifactId>klib-excel</artifactId>
 	<packaging>jar</packaging>
 	<name>klib-excel</name>
+
+	<url>https://github.com/godheaven/klib-excel</url>
+
+	<scm>
+		<connection>scm:git:https://github.com/godheaven/klib-excel.git</connection>
+		<developerConnection>scm:git:https://github.com/godheaven/klib-excel.git</developerConnection>
+		<url>https://github.com/godheaven/klib-excel</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<properties>
 		<maven.test.skip>false</maven.test.skip>
