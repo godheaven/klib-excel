@@ -26,6 +26,7 @@ package cl.kanopus.excel.writer;
 import cl.kanopus.excel.writer.streaming.KSheet;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -33,7 +34,10 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class KanopusExcel {
+/**
+ * Streaming (SXSSF) XLSX writer. An instance is single-use: {@link #write(OutputStream)} / {@link #generateOutput()} write the workbook and release its temporary files. Use try-with-resources (or {@link #close()}) so the temporary files are also removed when the workbook is never written.
+ */
+public class KanopusExcel implements AutoCloseable {
 
     public enum Style {
         FONT_BLACK_BOLD,
@@ -55,6 +59,10 @@ public class KanopusExcel {
         DEFAULT_VALUE_NORMAL_DATETIME,
     }
 
+    /**
+     * @deprecated use {@link #getStyle(Style)}, {@link #getStyle(DefaultStyle)}, {@link #getStyle(String)} or {@link #registerStyle(String, CellStyle)}.
+     */
+    @Deprecated(since = "4.20.0", forRemoval = true)
     public final Map<String, CellStyle> styles = new HashMap<>();
 
     private final SXSSFWorkbook wb;
@@ -79,11 +87,57 @@ public class KanopusExcel {
 
     public final ByteArrayOutputStream generateOutput() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try (wb) {
-            wb.write(out);
-            wb.dispose(); // Dispose of temporary files backing this workbook on disk.
-        }
+        write(out);
         return out;
+    }
+
+    /**
+     * Writes the workbook to the given stream (which is not closed) and releases the workbook resources, including its temporary files, even on failure.
+     */
+    public final void write(OutputStream out) throws IOException {
+        try {
+            wb.write(out);
+        } finally {
+            close();
+        }
+    }
+
+    /** Disposes the temporary files backing this workbook and closes it. Safe to call more than once. */
+    @Override
+    public void close() throws IOException {
+        try {
+            wb.dispose(); // Dispose of temporary files backing this workbook on disk.
+        } finally {
+            wb.close();
+        }
+    }
+
+    public CellStyle getStyle(Style style) {
+        return style == null ? null : getStyle(style.name());
+    }
+
+    public CellStyle getStyle(DefaultStyle style) {
+        return style == null ? null : getStyle(style.name());
+    }
+
+    /** Returns a predefined style (by {@link Style}/{@link DefaultStyle} name) or a style added with {@link #registerStyle(String, CellStyle)}. */
+    public CellStyle getStyle(String name) {
+        return styles.get(name);
+    }
+
+    /** Registers a custom style created with {@link #createCellStyle()}, retrievable with {@link #getStyle(String)}. */
+    public void registerStyle(String name, CellStyle style) {
+        styles.put(name, style);
+    }
+
+    /** Creates a new cell style in this workbook (to customize and pass to {@code KRow.createCell(Object, CellStyle, String)}). */
+    public CellStyle createCellStyle() {
+        return wb.createCellStyle();
+    }
+
+    /** Creates a new font in this workbook. */
+    public Font createFont() {
+        return wb.createFont();
     }
 
     public CreationHelper getFactory() {
@@ -129,7 +183,7 @@ public class KanopusExcel {
 
             /* Style FONT_BLACK_NORMAL */
             font = workbook.createFont();
-            font.setBold(true);
+            font.setBold(false);
             style = workbook.createCellStyle();
             style.setFont(font);
             styles.put(Style.FONT_BLACK_NORMAL.name(), style);

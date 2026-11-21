@@ -25,7 +25,9 @@ package cl.kanopus.excel.writer;
 
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class ResultSetExcel extends KanopusExcel {
@@ -45,31 +47,35 @@ public class ResultSetExcel extends KanopusExcel {
         return createSheet(SHEET_RECORDS, records);
     }
 
+    /**
+     * Writes the records in a new sheet. The header (and the column order) is taken from the keys of the first record; values of later records are looked up by those keys (missing keys produce empty cells, extra keys are ignored).
+     *
+     * @return the number of data rows written (excluding the header).
+     */
     public int createSheet(String sheetName, Iterator<Map<String, Object>> records) {
         int rows = 0;
-        KSheet sheet = createSheet(SHEET_RECORDS);
+        KSheet sheet = createSheet(sheetName);
 
-        boolean headerIncluded = false;
-
-        int columns = 0;
+        List<String> header = null;
         while (records.hasNext()) {
             Map<String, Object> p = records.next();
 
-            if (!headerIncluded) {
-                KRow header = sheet.createRow();
-                for (String title : p.keySet()) {
-                    header.createCell(title, KanopusExcel.Style.TABLE_TITLE_NORMAL);
-                    columns++;
+            if (header == null) {
+                header = new ArrayList<>(p.keySet());
+                KRow headerRow = sheet.createRow();
+                for (String title : header) {
+                    headerRow.createCell(title, KanopusExcel.Style.TABLE_TITLE_NORMAL);
                 }
-                headerIncluded = true;
             }
 
             KRow row = sheet.createRow();
-            for (Object value : p.values()) {
-                row.createCell(value, KanopusExcel.Style.TABLE_VALUE_NORMAL);
+            for (String key : header) {
+                row.createCell(p.get(key), KanopusExcel.Style.TABLE_VALUE_NORMAL);
             }
+            rows++;
         }
 
+        int columns = header == null ? 0 : header.size();
         if (enableAutoFilter) {
             sheet.autoFilter(columns);
         }
