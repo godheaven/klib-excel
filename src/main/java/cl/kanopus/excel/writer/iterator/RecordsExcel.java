@@ -27,6 +27,7 @@ import cl.kanopus.excel.writer.KanopusExcel;
 import cl.kanopus.excel.writer.streaming.KRow;
 import cl.kanopus.excel.writer.streaming.KSheet;
 import java.util.List;
+import java.util.Locale;
 
 class RecordsExcel extends KanopusExcel {
 
@@ -50,7 +51,7 @@ class RecordsExcel extends KanopusExcel {
     public void createHeaders(List<String> titles) {
         KRow header = sheet.createRow();
         for (String title : titles) {
-            header.createCell(title.toUpperCase(), Style.TABLE_TITLE_NORMAL);
+            header.createCell(title.toUpperCase(Locale.ROOT), Style.TABLE_TITLE_NORMAL);
         }
         sheet.createFreezePane(0, 1);
         columns = titles.size();
@@ -65,11 +66,11 @@ class RecordsExcel extends KanopusExcel {
     }
 
     public void autoSize() {
-        sheet.autoFilter(columns);
+        sheet.autoSize(columns);
     }
 
     public void autoFilter() {
-        sheet.autoSize(columns);
+        sheet.autoFilter(columns);
     }
 
     public boolean isEnableRecordStyle() {

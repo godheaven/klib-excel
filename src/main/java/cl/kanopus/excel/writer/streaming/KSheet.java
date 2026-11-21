@@ -38,9 +38,15 @@ public class KSheet {
         this.excel = excel;
         this.sheet = sheet;
         this.sheet.setDefaultColumnWidth(15);
+        // Rows are flushed to disk as they are written, so auto-sizing must track the columns from the first row.
+        this.sheet.trackAllColumnsForAutoSizing();
     }
 
     public KRow createRow() {
+        if (indexRow == AUTO_LIMIT) {
+            // autoSize is not supported over AUTO_LIMIT rows; stop paying the tracking cost.
+            sheet.untrackAllColumnsForAutoSizing();
+        }
         return new KRow(excel, sheet.createRow(indexRow++));
     }
 
@@ -67,7 +73,6 @@ public class KSheet {
 
         if (columns > 0 && indexRow < AUTO_LIMIT) {
             for (int i = 0; i < columns; i++) {
-                sheet.trackAllColumnsForAutoSizing();
                 sheet.autoSizeColumn(i, false);
             }
         }

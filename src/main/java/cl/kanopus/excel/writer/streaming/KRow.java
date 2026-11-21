@@ -25,6 +25,7 @@ package cl.kanopus.excel.writer.streaming;
 
 import cl.kanopus.common.util.Utils;
 import cl.kanopus.excel.writer.KanopusExcel;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -85,6 +86,9 @@ public class KRow {
             cell.setCellValue((Integer) value);
         } else if (value instanceof Long) {
             cell.setCellValue((Long) value);
+        } else if (value instanceof Number number) {
+            // BigDecimal, BigInteger, Float, Short, Byte, ... (Excel stores numbers as IEEE 754 doubles)
+            cell.setCellValue(number.doubleValue());
         } else if (value instanceof Calendar) {
             cell.setCellValue((Calendar) value);
         } else if (value instanceof Date) {
@@ -111,20 +115,20 @@ public class KRow {
     private CellStyle calculateStyle(Object value, KanopusExcel.Style style) {
         CellStyle cellStyle = null;
         if (style != null) {
-            cellStyle = excel.styles.get(style.name());
+            cellStyle = excel.getStyle(style);
         }
 
-        if (value instanceof Date || value instanceof LocalDate) {
+        if (value instanceof LocalDateTime || value instanceof Timestamp) {
             if (style == null) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATE.name());
+                cellStyle = excel.getStyle(KanopusExcel.DefaultStyle.DEFAULT_DATETIME);
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE.name());
+                cellStyle = excel.getStyle(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME);
             }
-        } else if (value instanceof LocalDateTime) {
+        } else if (value instanceof Date || value instanceof LocalDate || value instanceof Calendar) {
             if (style == null) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_DATETIME.name());
+                cellStyle = excel.getStyle(KanopusExcel.DefaultStyle.DEFAULT_DATE);
             } else if (style == KanopusExcel.Style.TABLE_VALUE_NORMAL) {
-                cellStyle = excel.styles.get(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATETIME.name());
+                cellStyle = excel.getStyle(KanopusExcel.DefaultStyle.DEFAULT_VALUE_NORMAL_DATE);
             }
         }
 
